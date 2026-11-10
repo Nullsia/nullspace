@@ -3,8 +3,8 @@ import { ArrowUpRight } from "lucide-react";
 import HeroScroll, { HeroRack } from "../components/HeroScroll";
 import "./Home.css";
 
-const HERO = "/manus-storage/async-images/067OFDq8006Qi5bt6RLBz8/image-1.webp";
-const SPACE = "/manus-storage/async-images/067OFDq8006Qi5bt6RLBz8/image-2.webp";
+const HERO = "/images/datacenter-hero.webp";
+const SPACE = "/images/datacenter-space.webp";
 
 const scenarios = [
   { ko: "기준 운전", en: "Baseline", code: "01", note: "BASELINE OPERATION", desc: "현재의 운영 상태를 하나의 기준으로 읽습니다.", enDesc: "Read the current operating state as a clear baseline." },

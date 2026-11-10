@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { ArrowUpRight } from "lucide-react";
 import "./ScenarioLab.css";
 
-const SPACE = "/manus-storage/async-images/067OFDq8006Qi5bt6RLBz8/image-2.webp";
+const SPACE = "/images/datacenter-space.webp";
 const scenarios = [
   { ko: "기준 운전", en: "Baseline", koDesc: "현재의 운영 상태를 하나의 기준으로 읽습니다.", enDesc: "Read the current operating state as a clear baseline." },
   { ko: "AI 랙 증설", en: "AI rack expansion", koDesc: "고밀도 랙이 추가될 때 공간의 변화를 살펴봅니다.", enDesc: "See how the space changes as high-density racks are added." },

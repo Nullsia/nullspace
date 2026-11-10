@@ -2,7 +2,9 @@
   "buildCommand": "pnpm build:static",
   "outputDirectory": "dist/public",
   "rewrites": [
-    { "source": "/manus-storage/:path*", "destination": "https://nullspace-mj2h6hhh.manus.space/manus-storage/:path*" },
-    { "source": "/((?!api/|images/|assets/|manus-storage/).*)", "destination": "/index.html" }
+    {
+      "source": "/((?!api/|images/|assets/).*)",
+      "destination": "/index.html"
+    }
   ]
 }
