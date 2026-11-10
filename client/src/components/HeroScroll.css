@@ -1,0 +1,62 @@
+/* The stage is taller than one viewport, but only the hero itself sticks. */
+.hero-scroll-stage {
+  position: relative;
+  --hero-zoom: 1;
+  --hero-origin-x: 65%;
+  --hero-origin-y: 65%;
+  --hero-rack-opacity: .2;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .hero-scroll-stage {
+    height: calc(100svh + min(70svh, 650px));
+  }
+
+  .hero-scroll-stage > .hero {
+    position: sticky;
+    top: 0;
+    height: 100svh;
+    min-height: 0;
+    max-height: none;
+  }
+
+  .hero-scroll-stage .hero-art {
+    transform: scale(var(--hero-zoom));
+    transform-origin: var(--hero-origin-x) var(--hero-origin-y);
+    transition: transform 160ms ease-out;
+  }
+
+  .hero-scroll-stage .hero-rack {
+    transition: opacity 160ms ease-out;
+  }
+}
+
+.hero-scroll-stage .hero-art,
+.hero-scroll-stage .hero-grid,
+.hero-scroll-stage .hero-reticle {
+  pointer-events: none;
+}
+
+/* The SVG uses the same rendered image dimensions and position as cover. */
+.hero-rack {
+  position: absolute;
+  display: block;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 0;
+  overflow: visible;
+  opacity: 0;
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+
+.hero-rack[data-ready="true"] {
+  opacity: var(--hero-rack-opacity);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-scroll-stage {
+    --hero-rack-opacity: .65;
+  }
+}

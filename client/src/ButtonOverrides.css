@@ -1,0 +1,300 @@
+/*
+ * Text-and-rule controls. Card links (home, products, company and news)
+ * remain information layouts and are intentionally not included here.
+ */
+:is(
+  button:not([role="checkbox"]):not([role="switch"]),
+  input[type="button"],
+  input[type="submit"],
+  input[type="reset"],
+  a.button,
+  a.header-cta,
+  a.mobile-contact,
+  a.language-link,
+  .desktop-nav .nav-panel a,
+  .hero-buttons a.text-link,
+  .info-page a.info-button,
+  .info-page a.info-text-link,
+  .subpage a.sp-arrow-link,
+  .subpage a.sp-text-link,
+  .en-page a.en-arrow-link,
+  .en-page a.en-text-link,
+  .subpage .sp-faq summary,
+  .subpage .sp-archive-item summary,
+  .en-page .en-faq summary,
+  .en-page .en-archive-item summary,
+  .not-found a
+) {
+  min-height: 44px;
+  border: 0;
+  border-bottom: 1px solid currentColor;
+  border-radius: 0;
+  background: transparent;
+  color: #f3f3f3;
+  box-shadow: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  text-decoration: none;
+  transform: none;
+  transition: background-color .2s, color .2s, border-color .2s;
+}
+
+/* Inline language and mobile menu controls retain comfortable hit areas. */
+.language-link {
+  display: inline-flex;
+  min-width: 44px;
+  align-items: center;
+  justify-content: center;
+}
+
+.menu-toggle {
+  min-width: 44px;
+  align-items: center;
+  justify-content: center;
+}
+
+/* The original Korean CTA rules use !important and must be superseded. */
+.subpage :is(.sp-arrow-link, .sp-form-submit) {
+  color: #f3f3f3 !important;
+}
+
+/* Selection is still legible without a filled background, including on touch. */
+.scenario-tabs button[aria-pressed="true"],
+.site-header .nav-trigger[aria-expanded="true"] {
+  color: var(--lime);
+  border-bottom: 2px solid var(--lime);
+  font-weight: 700;
+}
+
+/* The full home also places action links on both light and dark surfaces. */
+.home-page a.underlined-link {
+  min-height: 44px;
+  border: 0;
+  border-bottom: 1px solid currentColor;
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+  box-shadow: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  text-decoration: none;
+  transition: background-color .2s, color .2s, border-color .2s;
+}
+
+.home-page a.underlined-link:focus-visible {
+  background: #fff;
+  color: #090909;
+  border-bottom-color: #090909;
+  outline: 2px solid var(--lime, #c6ff3d);
+  outline-offset: 4px;
+}
+
+/* Lime alone is too faint against the home's light section backgrounds. */
+.home-page :is(.intro-section, .solution-section, .playbook-section, .news-section) a.underlined-link:focus-visible {
+  outline-color: #111;
+}
+
+@media (hover: hover) {
+  .home-page a.underlined-link:hover {
+    background: #fff;
+    color: #090909;
+    border-bottom-color: #090909;
+  }
+}
+
+/* A real keyboard focus indicator is retained in addition to inversion. */
+:is(
+  button:not([role="checkbox"]):not([role="switch"]),
+  input[type="button"],
+  input[type="submit"],
+  input[type="reset"],
+  a.button,
+  a.header-cta,
+  a.mobile-contact,
+  a.language-link,
+  .desktop-nav .nav-panel a,
+  .hero-buttons a.text-link,
+  .info-page a.info-button,
+  .info-page a.info-text-link,
+  .subpage a.sp-arrow-link,
+  .subpage a.sp-text-link,
+  .en-page a.en-arrow-link,
+  .en-page a.en-text-link,
+  .subpage .sp-faq summary,
+  .subpage .sp-archive-item summary,
+  .en-page .en-faq summary,
+  .en-page .en-archive-item summary,
+  .not-found a
+):focus-visible {
+  background: #fff;
+  color: #090909;
+  border-bottom-color: #090909;
+  outline: 2px solid var(--lime, #c6ff3d);
+  outline-offset: 4px;
+}
+
+.subpage :is(.sp-arrow-link, .sp-form-submit):focus-visible {
+  color: #090909 !important;
+}
+
+/* Avoid a sticky hover treatment on touch-only devices. */
+@media (hover: hover) {
+  :is(
+    button:not([role="checkbox"]):not([role="switch"]),
+    input[type="button"],
+    input[type="submit"],
+    input[type="reset"],
+    a.button,
+    a.header-cta,
+    a.mobile-contact,
+    a.language-link,
+    .desktop-nav .nav-panel a,
+    .hero-buttons a.text-link,
+    .info-page a.info-button,
+    .info-page a.info-text-link,
+    .subpage a.sp-arrow-link,
+    .subpage a.sp-text-link,
+    .en-page a.en-arrow-link,
+    .en-page a.en-text-link,
+    .subpage .sp-faq summary,
+    .subpage .sp-archive-item summary,
+    .en-page .en-faq summary,
+    .en-page .en-archive-item summary,
+    .not-found a
+  ):not(:disabled):not([aria-disabled="true"]):hover {
+    background: #fff;
+    color: #090909;
+    border-bottom-color: #090909;
+    transform: none;
+  }
+
+  .subpage :is(.sp-arrow-link, .sp-form-submit):not(:disabled):not([aria-disabled="true"]):hover {
+    color: #090909 !important;
+  }
+}
+
+/* Older page styles also declare :hover; neutralize them on touch screens. */
+@media (hover: none) {
+  :is(
+    button:not([role="checkbox"]):not([role="switch"]),
+    input[type="button"],
+    input[type="submit"],
+    input[type="reset"],
+    a.button,
+    a.header-cta,
+    a.mobile-contact,
+    a.language-link,
+    .desktop-nav .nav-panel a,
+    .hero-buttons a.text-link,
+    .info-page a.info-button,
+    .info-page a.info-text-link,
+    .subpage a.sp-arrow-link,
+    .subpage a.sp-text-link,
+    .en-page a.en-arrow-link,
+    .en-page a.en-text-link,
+    .subpage .sp-faq summary,
+    .subpage .sp-archive-item summary,
+    .en-page .en-faq summary,
+    .en-page .en-archive-item summary,
+    .not-found a
+  ):not(:focus-visible):hover {
+    background: transparent;
+    color: #f3f3f3;
+    border-bottom-color: currentColor;
+    transform: none;
+  }
+
+  .subpage :is(.sp-arrow-link, .sp-form-submit):not(:focus-visible):hover {
+    color: #f3f3f3 !important;
+  }
+
+  .scenario-tabs button[aria-pressed="true"]:not(:focus-visible):hover,
+  .site-header .nav-trigger[aria-expanded="true"]:not(:focus-visible):hover {
+    color: var(--lime);
+    border-bottom-color: var(--lime);
+  }
+
+  .home-page a.underlined-link:not(:focus-visible):hover {
+    background: transparent;
+    color: inherit;
+    border-bottom-color: currentColor;
+  }
+}
+
+/* Accent-colored arrows and disclosure labels must also invert on white. */
+:is(
+  button:not([role="checkbox"]):not([role="switch"]),
+  a.button,
+  a.header-cta,
+  a.mobile-contact,
+  a.language-link,
+  .desktop-nav .nav-panel a,
+  .hero-buttons a.text-link,
+  .info-page a.info-button,
+  .info-page a.info-text-link,
+  .subpage a.sp-arrow-link,
+  .subpage a.sp-text-link,
+  .en-page a.en-arrow-link,
+  .en-page a.en-text-link,
+  .subpage .sp-faq summary,
+  .subpage .sp-archive-item summary,
+  .en-page .en-faq summary,
+  .en-page .en-archive-item summary
+):focus-visible :is(span, strong, svg) {
+  color: inherit;
+  border-color: currentColor;
+}
+
+@media (hover: hover) {
+  :is(
+    button:not([role="checkbox"]):not([role="switch"]),
+    a.button,
+    a.header-cta,
+    a.mobile-contact,
+    a.language-link,
+    .desktop-nav .nav-panel a,
+    .hero-buttons a.text-link,
+    .info-page a.info-button,
+    .info-page a.info-text-link,
+    .subpage a.sp-arrow-link,
+    .subpage a.sp-text-link,
+    .en-page a.en-arrow-link,
+    .en-page a.en-text-link,
+    .subpage .sp-faq summary,
+    .subpage .sp-archive-item summary,
+    .en-page .en-faq summary,
+    .en-page .en-archive-item summary
+  ):not(:disabled):not([aria-disabled="true"]):hover :is(span, strong, svg) {
+    color: inherit;
+    border-color: currentColor;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-page a.underlined-link { transition: none; }
+  :is(
+    button,
+    input[type="button"],
+    input[type="submit"],
+    input[type="reset"],
+    a.button,
+    a.header-cta,
+    a.mobile-contact,
+    a.language-link,
+    .desktop-nav .nav-panel a,
+    .hero-buttons a.text-link,
+    .info-page a.info-button,
+    .info-page a.info-text-link,
+    .subpage a.sp-arrow-link,
+    .subpage a.sp-text-link,
+    .en-page a.en-arrow-link,
+    .en-page a.en-text-link,
+    .subpage .sp-faq summary,
+    .subpage .sp-archive-item summary,
+    .en-page .en-faq summary,
+    .en-page .en-archive-item summary,
+    .not-found a
+  ) {
+    transition: none;
+  }
+}

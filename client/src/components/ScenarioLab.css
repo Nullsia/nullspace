@@ -1,0 +1,9 @@
+.scenario-module { padding: 110px 5vw 130px; background: #111; color: #f4f4f4; }
+.scenario-module-heading { display: grid; grid-template-columns: 1.4fr .6fr; gap: 10%; align-items: end; margin-bottom: 60px; }
+.scenario-module-heading h2 { font-size: clamp(38px, 4.5vw, 64px); line-height: 1.2; letter-spacing: -.06em; font-weight: 600; word-break: keep-all; }
+.scenario-module-heading h2 span { color: #929292; }
+.scenario-module-heading p { color: #aaa; font-size: 15px; line-height: 1.8; max-width: 360px; word-break: keep-all; }
+.scenario-module .lab-panel { min-height: 500px; }
+.scenario-module .lab-panel > div[aria-live] p { margin-bottom: 24px; }
+.scenario-module .lab-foot { margin: 0; }
+@media (max-width: 760px) { .scenario-module { padding: 80px 22px 90px; } .scenario-module-heading { display: block; margin-bottom: 36px; } .scenario-module-heading p { margin-top: 24px; } .scenario-module .lab-panel { min-height: 0; } }

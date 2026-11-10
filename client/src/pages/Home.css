@@ -1,0 +1,49 @@
+/* Keep the hero headline on a single line while preserving the full-scroll home. */
+.home-page .hero-copy {
+  width: calc(100% - 2 * var(--gutter));
+  max-width: none;
+  top: 57%;
+}
+.home-page .hero h1 {
+  max-width: none;
+  white-space: nowrap;
+  font-size: clamp(1.55rem, 7vw, 6.5rem);
+  line-height: 1.05;
+}
+.home-page .hero-title-ko {
+  max-width: 100%;
+  font-size: 35pt;
+  line-height: 1.35;
+  font-weight: 500;
+  letter-spacing: -.045em;
+  word-break: keep-all;
+}
+.home-page .hero-buttons .button {
+  width: 196px;
+  min-width: 196px;
+  height: 54px;
+}
+@media (max-width: 1100px) {
+  .home-page .hero-title-ko { font-size: clamp(22px, 4.7vw, 35pt); }
+}
+@media (max-width: 760px) {
+  .home-page .hero-copy { width: calc(100% - 2 * var(--gutter)); top: 54%; }
+  .home-page .hero h1 { font-size: clamp(1.55rem, 7vw, 3.3rem); }
+  .home-page .hero-title-ko { font-size: clamp(22px, 5.4vw, 40px); }
+  .home-page .hero-buttons .button { width: 165px; min-width: 165px; height: 54px; }
+}
+.home-page .hero-title-en { font-size: clamp(17px, 1.55vw, 23px); }
+
+@media (max-height: 520px) {
+  .home-page .hero-copy { top: 47%; }
+  .home-page .hero h1 { font-size: clamp(26px, 5vw, 50px); }
+  .home-page .hero-title-ko { margin-top: 12px; font-size: clamp(18px, 2.5vw, 28px); }
+  .home-page .hero-buttons { margin-top: 16px; }
+  .home-page .hero-buttons .button { min-height: 44px; height: 44px; }
+}
+
+/* Keyboard users must be able to see any revealed content they focus. */
+.home-page .reveal:focus-within { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) {
+  .home-page .scanline { transition: none; }
+}
