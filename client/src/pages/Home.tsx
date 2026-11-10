@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ArrowUpRight } from "lucide-react";
 import HeroScroll, { HeroRack } from "../components/HeroScroll";
 import "./Home.css";
@@ -13,6 +13,38 @@ const scenarios = [
   { ko: "공급 22°C", en: "Supply 22°C", code: "04", note: "SUPPLY AIR 22°C", desc: "공급 온도 변화가 공간에 미치는 영향을 살펴봅니다.", enDesc: "Explore how a supply-temperature change affects the space." },
   { ko: "W3 고장", en: "W3 failure", code: "05", note: "W3 FAILURE", desc: "예상치 못한 상황에서도 다음 선택을 준비합니다.", enDesc: "Prepare the next decision for an unexpected situation." },
 ];
+
+const stats = [
+  { from: 1, to: 130, prefix: "", unit: "×", ko: "더 커진 데이터센터 공간", en: "Larger data center floor" },
+  { from: 50, to: 5, prefix: "±", unit: "mm", ko: "랙 안착 정밀도", en: "Rack placement precision" },
+  { from: 60, to: 1, prefix: "", unit: " sec", ko: "예측 산출 속도", en: "Prediction speed" },
+  { from: 0, to: 860, prefix: "₩", unit: "M/day", ko: "매출 비용 절감", en: "Revenue cost savings" },
+];
+
+function CountUp({ from, to, prefix, unit }: { from: number; to: number; prefix: string; unit: string }) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const [value, setValue] = useState(to);
+  useEffect(() => {
+    const node = ref.current;
+    if (!node || window.matchMedia("(prefers-reduced-motion: reduce)").matches || !("IntersectionObserver" in window)) return;
+    setValue(from);
+    let frame = 0;
+    const observer = new IntersectionObserver(entries => {
+      if (!entries[0].isIntersecting) return;
+      observer.disconnect();
+      const start = performance.now();
+      const tick = (now: number) => {
+        const t = Math.min(1, (now - start) / 1800);
+        setValue(from + (to - from) * (1 - Math.pow(1 - t, 3)));
+        if (t < 1) frame = requestAnimationFrame(tick);
+      };
+      frame = requestAnimationFrame(tick);
+    }, { threshold: 0.4 });
+    observer.observe(node);
+    return () => { observer.disconnect(); cancelAnimationFrame(frame); };
+  }, [from, to]);
+  return <span ref={ref} role="text" aria-label={`${prefix}${to}${unit}`}><span aria-hidden="true">{prefix}{Math.round(value)}<small>{unit}</small></span></span>;
+}
 
 const flow = [
   ["01", "ROBOT", "공간을 실측합니다", "Measure the space"],
@@ -96,31 +128,28 @@ function Home() {
 
     <section className="intro-section section-pad" id="problem">
 
-      <div className="intro-layout reveal"><div><h2>{english ? <>What you can't see<br/><em>costs you.</em></> : <>보이지 않는 공간이<br/><em>운영을 바꿉니다.</em></>}</h2></div><div className="intro-copy"><p>{english ? "Data centers are growing denser. But fixed sensors alone cannot tell the whole story of heat, airflow and the spaces in between." : "데이터센터는 더 크고 밀도 높아지고 있습니다. 하지만 고정된 센서만으로는 랙 사이의 열과 바람, 공간의 모든 변화를 알 수 없습니다."}</p><p>{english ? "NULL SPACE reveals the data you need to make the next decision with confidence." : "NULL SPACE는 보이지 않던 현장의 데이터를 드러내고, 더 정확한 다음 결정을 돕습니다."}</p><a className="underlined-link" href={path("/solution")}>{english ? "The problem we solve" : "우리가 푸는 문제"} <ArrowUpRight size={16}/></a></div></div>
-      <div className="stat-row reveal"><div><strong>₩860M<small>/day</small></strong><p>{english ? "Lease revenue delayed per day" : "하루 지연되는 임대 매출"}</p></div><div><strong>130<small>×</small></strong><p>{english ? "Larger data center floor" : "더 커진 데이터센터 공간"}</p></div><div><strong>1<small> sec</small></strong><p>{english ? "Thermal prediction time" : "열 예측에 걸리는 시간"}</p></div></div>
+      <div className="intro-layout reveal"><div><h2>{english ? <>What you can't see<br/><em>costs you.</em></> : <>보이지 않는 공간이<br/><em>운영을 바꿉니다.</em></>}</h2></div><div className="intro-copy"><p>{english ? "Data centers are growing denser. But fixed sensors alone cannot tell the whole story of heat, airflow and the spaces in between." : <>데이터센터는 더 크고 밀도 높아지고 있습니다.<br/>하지만 고정된 센서만으로는 랙 사이의 열과 바람, 공간의 모든 변화를 알 수 없습니다.</>}</p><p>{english ? "NULL SPACE reveals the data you need to make the next decision with confidence." : <>NULL SPACE는 보이지 않던 현장의 데이터를 드러내고,<br/>더 정확한 다음 결정을 돕습니다.</>}</p><a className="underlined-link" href={path("/solution")}>{english ? "The problem we solve" : "우리가 푸는 문제"} <ArrowUpRight size={16}/></a></div></div>
+      <div className="stat-row reveal">{stats.map(stat => <div key={stat.en}><strong><CountUp {...stat}/></strong><p>{english ? stat.en : stat.ko}</p></div>)}</div>
     </section>
 
     <section className="scenario-section section-pad" id="scenario">
 
-      <div className="scenario-heading reveal"><div><h2>{english ? <>Run the scenario.<br/><span>See what happens.</span></> : <>운전을 바꾸기 전에,<br/><span>먼저 돌려 봅니다.</span></>}</h2></div><p>{english ? "Explore how a change in the data center can affect the whole space. A better decision starts with a clearer view." : "데이터센터의 작은 변화가 공간 전체에 어떤 영향을 미칠까요. 더 나은 결정은 더 선명한 시야에서 시작됩니다."}</p></div>
+      <div className="scenario-heading reveal"><div><h2>{english ? <>Run the scenario.<br/><span>See what happens.</span></> : <>운영을 바꾸기 전에,<br/><span>먼저 돌려 봅니다.</span></>}</h2></div><p>{english ? "Explore how a change in the data center can affect the whole space. A better decision starts with a clearer view." : <>데이터센터의 작은 변화가 공간 전체에 어떤 영향을 미칠까요.<br/>더 나은 결정은 더 선명한 시야에서 시작됩니다.</>}</p></div>
       <div className="lab-shell reveal"><div className="lab-content"><div className="lab-visual" id="lab-visual" style={{backgroundImage: `linear-gradient(0deg, rgba(0,0,0,.35), transparent 55%), url('${SPACE}')`}}><div className="lab-crosshair" aria-hidden="true"><span>＋</span></div><ScenarioOverlay scenario={scenario}/><div className="scanline" aria-hidden="true"/></div><div className="lab-panel"><div aria-live="polite"><h3>{english ? selected.en : selected.ko}</h3><p>{english ? selected.enDesc : selected.desc}</p></div><div className="scenario-tabs" role="group" aria-label={english ? "Select scenario" : "시나리오 선택"}>{scenarios.map((item, i) => <button key={item.code} onClick={() => selectScenario(i)} className={scenario === i ? "active" : ""} aria-pressed={scenario === i}>{english ? item.en : item.ko}<ArrowUpRight size={14}/></button>)}</div></div></div><p className="lab-foot">{english ? "Illustrative scenario · not a calculated result or field-validated" : "시나리오 예시 · 계산 결과가 아니며 현장 실측 검증 전"}</p></div>
     </section>
 
     <section className="solution-section section-pad" id="solution">
 
-      <div className="solution-heading reveal"><div><h2>{english ? <>Not just robots.<br/><span>A new way to see.</span></> : <>로봇을 파는<br/><span>회사가 아닙니다.</span></>}</h2></div><div><p>{english ? "We connect physical execution with spatial intelligence. Robots collect the data, a digital twin reveals the space, and analysis verifies the next move." : "로봇은 시작일 뿐입니다. 현장을 측정하고, 공간을 이해하고, 변화를 예측하고 검증하는 하나의 연결된 흐름을 만듭니다."}</p><a className="underlined-link" href={path("/solution")}>{english ? "Discover our solution" : "솔루션 알아보기"} <ArrowUpRight size={16}/></a></div></div>
+      <div className="solution-heading reveal"><div><h2>{english ? <>Robots that execute.<br/><span>A platform that verifies.</span></> : <>실행하는 로봇,<br/><span>검증하는 플랫폼.</span></>}</h2></div><div><p>{english ? "We connect physical execution with spatial intelligence. Robots collect the data, a digital twin reveals the space, and analysis verifies the next move." : "로봇은 시작일 뿐입니다. 현장을 측정하고, 공간을 이해하고, 변화를 예측하고 검증하는 하나의 연결된 흐름을 만듭니다."}</p><a className="underlined-link" href={path("/solution")}>{english ? "Discover our solution" : "솔루션 알아보기"} <ArrowUpRight size={16}/></a></div></div>
       <div className="product-grid reveal"><a href={path("/solution/product/n-mover")} className="product-card"><div className="product-image mover"><img src="/images/n-mover.jpg" alt={english ? "N-Mover transporting a data center rack" : "데이터센터 랙을 운반하는 N-Mover"}/><ArrowUpRight size={19}/></div><div className="product-body"><div><h3>N-Mover</h3></div><p>{english ? "Precision in every move." : "구축의 모든 움직임을 정밀하게."}</p></div></a><a href={path("/solution/product/n-prover")} className="product-card"><div className="product-image prover"><img src="/images/n-prover.jpg" alt={english ? "N-Prover measuring data center space" : "데이터센터 공간을 측정하는 N-Prover"}/><ArrowUpRight size={19}/></div><div className="product-body"><div><h3>N-Prover</h3></div><p>{english ? "A closer look at every space." : "운영의 모든 공간을 더 가까이."}</p></div></a><a href={path("/solution/product/n-doras")} className="product-card platform-card"><div className="platform-graphic"><div className="orbital orbital-one"/><div className="orbital orbital-two"/><div className="orbital orbital-three"/><div className="orbital-center">N<span>+</span></div><ArrowUpRight size={19}/></div><div className="product-body"><div><h3>N-DORAS</h3></div><p>{english ? "One platform, connected intelligence." : "하나로 연결되는 공간의 지능."}</p></div></a></div>
     </section>
 
-    <section className="flywheel-section section-pad"><div className="flywheel-heading reveal"><div><h2>{english ? <>Every scan makes<br/>the next one <span>smarter.</span></> : <>측정할수록,<br/>더 잘 <span>이해합니다.</span></>}</h2></div><p>{english ? "Robot measurements and digital twins build a continuously improving picture of your data center." : "반복되는 측정과 검증이 데이터로 쌓입니다. 공간을 이해하는 지능은 매 순간 더 정교해집니다."}</p></div><div className="flow-grid reveal">{flow.map(([, title, ko, en], i) => <div className="flow-item" key={title}><div className="flow-symbol">{i === 0 ? "⌗" : i === 1 ? "∷" : i === 2 ? "◇" : "≈"}</div><h3>{title}</h3><p>{english ? en : ko}</p></div>)}</div></section>
+    <section className="flywheel-section section-pad"><div className="flywheel-heading reveal"><div><h2>{english ? <>A flywheel that spins<br/><span>faster as data grows.</span></> : <>데이터가 쌓일수록<br/><span>빨라지는 플라이휠.</span></>}</h2></div><p>{english ? "Robot measurements and digital twins build a continuously improving picture of your data center." : "반복되는 측정과 검증이 데이터로 쌓입니다. 공간을 이해하는 지능은 매 순간 더 정교해집니다."}</p></div><div className="flow-grid reveal">{flow.map(([, title, ko, en], i) => <div className="flow-item" key={title}><div className="flow-symbol">{i === 0 ? "⌗" : i === 1 ? "∷" : i === 2 ? "◇" : "≈"}</div><h3>{title}</h3><p>{english ? en : ko}</p></div>)}</div></section>
 
     <section className="case-section section-pad" id="traction"><div className="case-layout reveal"><div><h2>{english ? <>Proven where<br/>it <span>matters.</span></> : <>현장에서<br/><span>증명합니다.</span></>}</h2><p className="case-description">{english ? "Together with HD Hyundai Heavy Industries, we are validating a new way to optimize cooling power in data centers." : "HD현대중공업과 함께 데이터센터 냉각 전력 최적화를 위한 새로운 가능성을 검증하고 있습니다."}</p><a className="underlined-link light" href={path("/company/partners")}>{english ? "Explore the pilot" : "실증 계획 자세히 보기"} <ArrowUpRight size={16}/></a></div><div className="case-card"><div className="case-partner">HD HYUNDAI<br/><span>HEAVY INDUSTRIES</span></div><div className="case-card-description">{english ? "Data center cooling power optimization" : "데이터센터 냉각 전력 최적화 공동 실증"}</div><div className="case-timeline"><div><strong>DIAGNOSE</strong><small>2026.11—12</small></div><div><strong>IMPROVE</strong><small>2027.01—02</small></div><div><strong>VERIFY</strong><small>2027.03</small></div></div></div></div></section>
 
-    <section className="playbook-section section-pad" id="playbook"><div className="playbook-head reveal"><div><h2>{english ? <>A better way<br/>to <em>move forward.</em></> : <>작게 시작해,<br/><em>확실하게 바꿉니다.</em></>}</h2></div><div><p>{english ? "We work alongside your team to measure, improve and verify impact before scaling." : "우리는 현장과 함께 작은 범위에서 시작합니다. 측정하고, 개선하고, 수치로 검증한 뒤 다음 단계로 나아갑니다."}</p><a className="underlined-link" href={path("/company/team")}>{english ? "How we work" : "단계별 진행 방식 보기"}<ArrowUpRight size={16}/></a></div></div><div className="playbook-steps reveal"><div><h3>{english ? "See the present" : "현재를 측정합니다"}</h3><p>{english ? "Find the baseline in the field." : "현장의 기준과 우선순위를 찾습니다."}</p></div><div><h3>{english ? "Find the cause" : "원인을 찾습니다"}</h3><p>{english ? "Make informed changes together." : "데이터를 바탕으로 개선합니다."}</p></div><div><h3>{english ? "Verify the impact" : "변화를 검증합니다"}</h3><p>{english ? "Measure impact and scale with confidence." : "변화를 확인하고 가능성을 확장합니다."}</p></div></div></section>
 
-    <section className="english-team section-pad" id="team"><div className="english-team-inner reveal"><div><h2>{english ? <>Built by people<br/><span>who build.</span></> : <>만드는 사람들이<br/><span>함께합니다.</span></>}</h2></div><div><p>{english ? "A team with experience planning, building and deploying robot automation in real sites." : "현장에서 로봇 자동화를 기획하고 구축해 온 사람들이 함께합니다."}</p><strong>{english ? "Seunghoon Lee" : "이승훈"}</strong><small>FOUNDER & CEO / ROBOT AUTOMATION</small><a className="underlined-link light" href={path("/company/team")}>{english ? "Meet the team" : "팀 알아보기"} <ArrowUpRight size={16}/></a></div></div></section>
 
-    <section className="next-section section-pad"><div className="next-header reveal"><h2>{english ? "Let's see further, together." : "다음의 변화를 함께합니다."}</h2><p>{english ? "Find your way into NULL SPACE." : "당신의 관점에서 NULL SPACE를 만나보세요."}</p></div><div className="next-grid reveal">{(english ? [["01", "Operators", "Explore your space", "/contact"], ["02", "Investors", "Explore the solution", "/solution"], ["03", "Partners", "Explore our company", "/company"], ["04", "Talent", "Explore careers", "/careers"]] : [["01", "운영사", "우리 센터 살펴보기", "/contact"], ["02", "투자사", "솔루션 알아보기", "/solution"], ["03", "파트너사", "회사 알아보기", "/company"], ["04", "인재", "함께하기", "/careers"]]).map(([n, title, text, link]) => <a href={path(link)} key={n}><ArrowUpRight size={20}/><div><h3>{title}</h3><p>{text}</p></div></a>)}</div></section>
 
     <section className="news-section section-pad"><div className="news-head reveal"><div><h2>{english ? "Ideas in motion." : "새로운 소식과 생각."}</h2></div><a className="underlined-link" href={path("/news")}>{english ? "All news" : "전체 글 보기"}<ArrowUpRight size={16}/></a></div><div className="news-list reveal"><a href={path("/news/cfd-containment-200-racks")}><strong>{english ? "A closer look at containment in a 200-rack data center" : "200랙 데이터센터, 컨테인먼트를 들여다보다"}</strong><ArrowUpRight size={22}/></a><a href={path("/news/hd-hhi-cooling-pilot")}><strong>{english ? "A joint cooling optimization pilot with HD Hyundai Heavy Industries" : "HD현대중공업과 냉각 최적화 공동 실증"}</strong><ArrowUpRight size={22}/></a></div></section>
 

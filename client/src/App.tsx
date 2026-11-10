@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { ArrowUpRight, ChevronDown, Menu, X } from "lucide-react";
+import { ArrowUpRight, ChevronDown, Globe, Menu, X } from "lucide-react";
 import { Route, Switch, useLocation } from "wouter";
 import Home from "./pages/Home";
 import { InfoPage } from "./pages/InformationPages";
@@ -8,6 +8,7 @@ import { EnglishNewsPage, EnglishNewsDetailPage, EnglishCareersPage, EnglishCare
 import "./index.css";
 import "./Navigation.css";
 import "./ButtonOverrides.css";
+import "./HeaderOverrides.css";
 
 type Language = "ko" | "en";
 type Group = "solution" | "company";
@@ -82,7 +83,7 @@ function Header({ lang, path }: { lang: Language; path: string }) {
         <a className="mobile-contact" href={localPath("/contact", lang)} onClick={closeMenu}>{en ? "Contact" : "문의"}<ArrowUpRight size={16} /></a>
       </nav>
       <div className="header-actions">
-        <a className="language-link" href={`${localeLink}${window.location.search}${window.location.hash}`} onClick={event => { event.currentTarget.href = `${localeLink}${window.location.search}${window.location.hash}`; }} aria-label={en ? "한국어로 보기" : "View in English"}>{en ? "KO" : "EN"}<span> ↗</span></a>
+        <a className="language-link" href={`${localeLink}${window.location.search}${window.location.hash}`} onClick={event => { event.currentTarget.href = `${localeLink}${window.location.search}${window.location.hash}`; }} aria-label={en ? "한국어로 보기" : "View in English"}><Globe size={15} aria-hidden="true" />{en ? "KO" : "EN"}</a>
         <a className="header-cta" href={localPath("/contact", lang)}>{en ? "Contact" : "문의"}<ArrowUpRight size={15} /></a>
         <button ref={menuRef} className="menu-toggle" type="button" onClick={() => { setOpen(!open); setExpanded(null); }} aria-expanded={open} aria-controls="main-navigation" aria-label={en ? (open ? "Close menu" : "Open menu") : (open ? "메뉴 닫기" : "메뉴 열기")}>{open ? <X size={23} /> : <Menu size={23} />}</button>
       </div>
