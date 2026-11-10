@@ -30,3 +30,11 @@
   .home-page .stat-row > div:nth-child(n+3) { border-top: 1px solid #aaa; }
 }
 .home-page .stat-row strong span { font: inherit; color: inherit; letter-spacing: inherit; }
+
+/* 3D scenario twin replaces the still image once WebGL is ready. */
+.lab-visual-3d { min-height: 540px; }
+.lab-visual-3d::before { display: none; }
+.lab-3d-layer { position: absolute; inset: 0; opacity: 0; transition: opacity .7s; }
+.lab-3d-layer.is-ready { opacity: 1; }
+.lab-3d-hint { position: absolute; right: 14px; bottom: 12px; font: 10px var(--mono); letter-spacing: .08em; color: rgba(255,255,255,.5); pointer-events: none; }
+@media (max-width: 760px) { .lab-visual-3d { min-height: 0; height: 360px; } }

@@ -1,0 +1,37 @@
+.fw-stage { position: relative; aspect-ratio: 16 / 9; overflow: hidden; border: 1px solid #555; background: #05070b; }
+.fw-layer, .fw-labels { position: absolute; inset: 0; opacity: 0; transition: opacity .7s; }
+.fw-layer.is-ready, .fw-labels.is-ready { opacity: 1; }
+.fw-labels { pointer-events: none; overflow: hidden; }
+.fw-node, .fw-edge, .fw-source { position: absolute; top: 0; left: 0; white-space: nowrap; }
+.fw-node { padding: 6px 12px; border: 1px solid rgba(255,255,255,.3); background: rgba(9,9,9,.8); color: #eee; font-size: 13px; font-weight: 700; transition: background .2s, color .2s, border-color .2s; }
+.fw-node.on { background: var(--lime); border-color: var(--lime); color: #090909; }
+.fw-edge { font-size: 12px; color: rgba(255,255,255,.55); }
+.fw-source { font: 12px var(--mono); color: rgba(255,255,255,.7); }
+.fw-hud { position: absolute; left: 14px; top: 14px; display: flex; flex-wrap: wrap; gap: 8px; pointer-events: none; font-size: 12px; }
+.fw-hud span { padding: 6px 10px; background: rgba(9,9,9,.7); color: #ccc; }
+.fw-hud b { color: var(--lime); font-family: var(--mono); font-weight: 500; }
+.site-header ~ main .fw-toggle, .fw-toggle { position: absolute; right: 14px; top: 14px; display: grid; place-items: center; width: 44px; min-width: 44px; height: 44px; padding: 0; border: 1px solid rgba(255,255,255,.3) !important; background: rgba(9,9,9,.7) !important; color: #eee !important; }
+@media (hover: hover) { .fw-toggle:hover { border-color: var(--lime) !important; color: var(--lime) !important; } }
+.fw-caption { position: absolute; left: 14px; bottom: 14px; max-width: 440px; padding: 14px 16px; background: rgba(9,9,9,.75); pointer-events: none; }
+.fw-caption strong { display: block; font-size: 14px; }
+.fw-caption em { font-style: normal; color: var(--lime); margin-right: 4px; }
+.fw-caption p { margin-top: 6px; font-size: 12px; line-height: 1.7; color: #aaa; word-break: keep-all; }
+.fw-steps { margin: 0; padding: 0; list-style: none; }
+.fw-steps .flow-item { padding: 0 !important; min-height: 0; }
+.fw-steps button { width: 100%; height: 100%; min-height: 120px; padding: 24px 24px 28px 0; border: 0 !important; background: transparent !important; color: #f4f4f4 !important; text-align: left; display: block; }
+.fw-steps .flow-item + .flow-item button { padding-left: 25px; }
+.fw-steps button h3 { font: 500 14px var(--mono); letter-spacing: .04em; color: inherit; }
+.fw-steps button p { margin-top: 10px; font-size: 12px; color: #999; }
+.fw-steps button.active h3 { color: var(--lime); }
+@media (hover: hover) { .fw-steps button:not(:disabled):hover h3 { color: var(--lime); } }
+.fw-results { display: grid; grid-template-columns: repeat(3, 1fr); border-bottom: 1px solid #555; }
+.fw-results > div { padding: 28px 24px 34px 0; }
+.fw-results > div + div { border-left: 1px solid #555; padding-left: 25px; }
+.fw-results h3 { font-size: 19px; letter-spacing: -.04em; }
+.fw-results p { margin-top: 12px; font-size: 12px; line-height: 1.7; color: #999; word-break: keep-all; }
+.fw-note { margin-top: 16px; font: 9px var(--mono); letter-spacing: .08em; color: #777; }
+.fw-steps { margin-top: 0; border-top: 0 !important; }
+.fw-caption-out { display: none; }
+@media (max-width: 1023px) { .fw-stage { aspect-ratio: 16 / 10; } .fw-caption-in { display: none; } .fw-caption-out { display: block; position: static; max-width: none; background: #111; border: 1px solid #555; border-top: 0; } }
+@media (max-width: 760px) { .fw-hud { display: none; } .fw-steps button { min-height: 0; padding: 18px 12px !important; } .fw-results { grid-template-columns: 1fr; } .fw-results > div + div { border-left: 0; padding-left: 0; border-top: 1px solid #555; } .fw-results > div { padding: 22px 0; } .fw-stage { aspect-ratio: 4 / 5; } }
+@media (prefers-reduced-motion: reduce) { .fw-layer, .fw-labels, .fw-node { transition: none; } }
