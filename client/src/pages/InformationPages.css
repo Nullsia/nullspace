@@ -161,3 +161,23 @@
 }
 .info-page .info-topic-title-icon { display: flex; align-items: center; gap: 14px; }
 .info-page .info-topic-icon { width: 30px; height: 30px; flex: none; color: var(--info-accent); }
+
+/* Team: five cards stacked in the middle that fan out when the section comes into view. */
+.info-page .info-team-section { display: block; }
+.info-page .info-team-fan { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 16px; }
+.info-page .info-team-card { position: relative; margin: 0; aspect-ratio: 640 / 954; overflow: hidden; border-radius: 14px; background: #1b1b1b;
+  transform: translateX(calc(var(--d) * (100% + 16px))) rotate(calc(var(--d) * -4deg)) scale(.94);
+  transition: transform 1s cubic-bezier(.2,.8,.2,1), box-shadow .3s; }
+.info-page .info-team-fan.is-open .info-team-card { transform: none; }
+.info-page .info-team-fan.is-open .info-team-card:hover { transform: translateY(-10px); box-shadow: 0 0 0 1px var(--lime, #c6ff3d); }
+.info-page .info-team-card img { display: block; width: 100%; height: 100%; object-fit: cover; filter: grayscale(1); transition: transform .6s ease; }
+.info-page .info-team-card:hover img { transform: scale(1.04); }
+.info-page .info-team-card figcaption { position: absolute; left: 0; right: 0; bottom: 0; display: flex; align-items: baseline; gap: 10px; padding: 48px 18px 16px; background: linear-gradient(transparent, rgba(0,0,0,.72)); color: #fff; }
+.info-page .info-team-card figcaption strong { font-size: 19px; font-weight: 500; letter-spacing: -.02em; }
+.info-page .info-team-card figcaption span { color: var(--lime, #c6ff3d); font-size: 13px; }
+.info-page .info-team-note { max-width: 640px; margin: 56px auto 0; text-align: center; color: var(--info-muted); font-size: 16px; line-height: 1.85; }
+@media (max-width: 760px) {
+  .info-page .info-team-fan { display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; margin: 0 -20px; padding: 0 20px 8px; }
+  .info-page .info-team-card { flex: 0 0 62%; scroll-snap-align: center; transform: none !important; }
+}
+@media (prefers-reduced-motion: reduce) { .info-page .info-team-card { transition: none; } }

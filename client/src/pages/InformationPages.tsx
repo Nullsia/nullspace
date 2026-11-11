@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import ScenarioLab from "../components/ScenarioLab";
 import "./InformationPages.css";
 import { Lines } from "../components/Lines";
@@ -240,6 +240,34 @@ function CompanyPage({ lang }: { lang: Language }) {
   </>;
 }
 
+/* 왼쪽부터 이영균, 전세영, 이승훈(가운데), 이영훈, 장시아 */
+const TEAM = [
+  { ko: "이영균", en: "Younggyun Lee", img: "lee-younggyun" },
+  { ko: "전세영", en: "Seyoung Jeon", img: "jeon-seyoung" },
+  { ko: "이승훈", en: "Seunghoon Lee", img: "lee-seunghoon", role: { ko: "설립자", en: "Founder" } },
+  { ko: "이영훈", en: "Younghoon Lee", img: "lee-younghoon" },
+  { ko: "장시아", en: "Sia Jang", img: "jang-sia" },
+];
+
+/** 다섯 장의 카드가 가운데에 겹쳐 있다가, 화면에 들어오면 양옆으로 펼쳐진다 */
+function TeamFan({ lang }: { lang: Language }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [open, setOpen] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setOpen(true); io.disconnect(); } }, { threshold: 0.35 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+  return <div ref={ref} className={`info-team-fan ${open ? "is-open" : ""}`}>
+    {TEAM.map((m, i) => <figure key={m.img} className="info-team-card" style={{ "--d": 2 - i, zIndex: 10 - Math.abs(2 - i) } as React.CSSProperties}>
+      <img src={`/images/team-${m.img}.webp`} alt={lang === "ko" ? m.ko : m.en} loading="lazy" />
+      <figcaption><strong>{lang === "ko" ? m.ko : m.en}</strong>{m.role && <span>{m.role[lang]}</span>}</figcaption>
+    </figure>)}
+  </div>;
+}
+
 function TeamPage({ lang }: { lang: Language }) {
   const working = [
     { title: { ko: "문제를 정의합니다", en: "Define the problem" }, text: { ko: "현장의 맥락을 이해하고 중요한 질문을 찾습니다.", en: "Understand the context and find the important questions." } },
@@ -249,8 +277,8 @@ function TeamPage({ lang }: { lang: Language }) {
   return <>
     <Hero title={lang === "ko" ? "서로 다른 관점이 모여" : "Different perspectives,"} muted={lang === "ko" ? "하나의 문제를 풉니다." : "shared questions."} description={lang === "ko" ? "현장의 문제를 깊이 이해하고 기술과 디자인으로 가능한 해답을 찾아가는 팀입니다." : "A team working to understand real-world problems and explore possible answers through technology and design."} />
     <section className="info-section info-team-section">
-      <div className="info-team-art"><Wireframe /></div>
-      <div className="info-team-copy"><h2>{lang === "ko" ? "이승훈" : "Seunghoon Lee"}</h2><p className="info-role"><Lines>{lang === "ko" ? "설립자" : "Founder"}</Lines></p><p><Lines>{lang === "ko" ? "데이터센터의 복잡한 문제를 새로운 시선으로 바라봅니다. NULL SPACE는 다양한 분야의 사람들이 함께 질문하고, 실험하고, 만들어가는 팀입니다." : "Looking at complex data center challenges from a new perspective. NULL SPACE is a team where people from different fields question, experiment, and build together."}</Lines></p></div>
+      <TeamFan lang={lang} />
+      <p className="info-team-note"><Lines>{lang === "ko" ? "데이터센터의 복잡한 문제를 새로운 시선으로 바라봅니다. NULL SPACE는 다양한 분야의 사람들이 함께 질문하고, 실험하고, 만들어가는 팀입니다." : "Looking at complex data center challenges from a new perspective. NULL SPACE is a team where people from different fields question, experiment, and build together."}</Lines></p>
     </section>
     <section className="info-section info-section-soft">
       <SectionHeading title={lang === "ko" ? "질문하고, 검증하며 나아갑니다." : "Question, validate, move forward."} description={lang === "ko" ? "큰 변화는 현장을 이해하는 일에서 시작됩니다." : "Meaningful change starts with understanding the field."} />
