@@ -65,6 +65,8 @@ const products: Record<ProductPage, {
     name: "N-DORAS",
     category: { ko: "정보의 연결", en: "Connecting information" },
     description: { ko: "구축과 운영에서 만들어지는 정보를 연결하는 통합 관리 솔루션입니다.", en: "An integrated management solution connecting information from installation and operations." },
+    image: "/images/n-doras-twin.webp",
+    imageAlt: { ko: "N-DORAS 디지털 트윈으로 본 데이터센터 랙과 기류", en: "Data center racks and airflow in the N-DORAS digital twin" },
     headline: { ko: "흩어진 정보를 하나의 흐름으로 바라봅니다.", en: "See separate information as part of one flow." },
     body: { ko: "N-DORAS는 데이터센터의 구축과 운영에서 만들어지는 정보를 연결하는 접근입니다. 각각의 과제를 분리하지 않고, 공간과 운영을 하나의 유기적인 시스템으로 바라봅니다.", en: "N-DORAS is an approach to connecting information generated through data center installation and operations. Rather than treating challenges in isolation, it considers space and operations as an interconnected system." },
     perspectives: [

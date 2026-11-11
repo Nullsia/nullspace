@@ -67,7 +67,8 @@
 .info-page .info-product-card:hover .info-product-art img { transform: scale(1.035); }
 .info-page .info-product-art-n-prover img { object-position: center 54%; }
 .info-page .info-product-art .info-wireframe { width: min(90%, 420px); height: auto; right: 50%; top: 50%; transform: translate(50%, -50%); opacity: .8; }
-.info-page .info-product-art-n-doras { background: linear-gradient(145deg, #202020, #111); }
+.info-page .info-product-art-n-doras { background: #0b0b0b; }
+.info-page .info-product-art-n-doras img { filter: none; object-position: 45% center; }
 .info-page .info-product-card-copy { padding: 25px; }
 .info-page .info-product-meta { display: flex; justify-content: space-between; align-items: center; gap: 12px; color: #b0b0b0; font-size: 12px; line-height: 1.5; }
 .info-page .info-product-card h3 { margin: 24px 0 12px; font-size: clamp(28px, 2.5vw, 38px); font-weight: 500; line-height: 1.2; letter-spacing: -.045em; }
