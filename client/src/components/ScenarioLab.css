@@ -2,8 +2,26 @@
 .scenario-module-heading { display: grid; grid-template-columns: 1.4fr .6fr; gap: 10%; align-items: end; margin-bottom: 60px; }
 .scenario-module-heading h2 { font-size: clamp(38px, 4.5vw, 64px); line-height: 1.2; letter-spacing: -.06em; font-weight: 600; word-break: keep-all; }
 .scenario-module-heading h2 span { color: #929292; }
-.scenario-module-heading p { color: #aaa; font-size: 15px; line-height: 1.8; max-width: 360px; word-break: keep-all; }
-.scenario-module .lab-panel { min-height: 500px; }
+.scenario-module-heading p { color: #aaa; font-size: 15px; line-height: 1.8; word-break: keep-all; }
+.scenario-module .lab-content { grid-template-columns: 1.45fr .75fr; min-height: 600px; }
+.scenario-module .lab-panel { min-height: 0; }
+.scenario-module .lab-panel-label { font: 12px var(--mono); letter-spacing: .08em; color: var(--lime); }
+.scenario-module .lab-panel h3 { margin-top: 14px; font-size: 24px; line-height: 1.35; word-break: keep-all; }
 .scenario-module .lab-panel > div[aria-live] p { margin-bottom: 24px; }
+.scenario-module .scenario-tabs button { padding: 14px 14px; gap: 14px; line-height: 1.45; border-radius: 0; transition: background-color .18s ease, color .18s ease; }
+.scenario-module .scenario-tabs button .tab-q { font: inherit; color: inherit; flex: 1; }
+.scenario-module .scenario-tabs button svg { flex: none; }
+.scenario-module .scenario-tabs button:hover { background: var(--lime) !important; color: #090909 !important; }
 .scenario-module .lab-foot { margin: 0; }
-@media (max-width: 760px) { .scenario-module { padding: 80px 22px 90px; } .scenario-module-heading { display: block; margin-bottom: 36px; } .scenario-module-heading p { margin-top: 24px; } .scenario-module .lab-panel { min-height: 0; } }
+.scenario-kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 16px 0 0; }
+.scenario-kpi { padding: 24px 26px 26px; border: 1px solid rgba(255,255,255,.2); border-radius: 22px; background: rgba(255,255,255,.045); }
+.scenario-kpi dt { font-size: 14px; color: #aaa; }
+.scenario-kpi .kpi-value { margin: 18px 0 10px; font-size: clamp(36px, 3.6vw, 52px); font-weight: 600; letter-spacing: -.05em; line-height: 1; font-variant-numeric: tabular-nums; }
+.scenario-kpi .kpi-value small { margin-left: .12em; font-size: .45em; letter-spacing: -.02em; }
+.scenario-kpi.is-hot .kpi-value { color: var(--lime); }
+.scenario-kpi .kpi-meta { margin: 0; }
+.kpi-delta { font-size: 13px; color: #8f8f8f; }
+.kpi-delta.is-good { color: var(--lime); }
+.kpi-delta.is-bad { color: #f2f2f2; }
+@media (max-width: 1050px) { .scenario-module .lab-content { grid-template-columns: 1fr; } .scenario-module .lab-panel { border-left: 0; border-top: 1px solid #515151; } }
+@media (max-width: 760px) { .scenario-module { padding: 80px 22px 90px; } .scenario-module-heading { display: block; margin-bottom: 36px; } .scenario-module-heading p { margin-top: 24px; } .scenario-kpis { grid-template-columns: 1fr; } }

@@ -133,9 +133,19 @@ function SectionHeading({ title, description }: { title: string; description?: s
   </div>;
 }
 
-function TopicCards({ items, lang }: { items: { title: Localized; text: Localized }[]; lang: Language }) {
+type TopicIcon = "space" | "flow" | "info";
+/** Small geometric marks for the definition topics: a cube (space), stacked waves (flow), linked nodes (information). */
+function TopicGlyph({ icon }: { icon: TopicIcon }) {
+  return <svg className="info-topic-icon" viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" strokeLinecap="round">
+    {icon === "space" && <><path d="M16 3 28 9.5v13L16 29 4 22.5v-13Z" /><path d="M4 9.5 16 16l12-6.5M16 16v13" /></>}
+    {icon === "flow" && <><path d="M3 10c4.3-4 8.7 4 13 0s8.7-4 13 0" /><path d="M3 16c4.3-4 8.7 4 13 0s8.7-4 13 0" /><path d="M3 22c4.3-4 8.7 4 13 0s8.7-4 13 0" /></>}
+    {icon === "info" && <><circle cx="16" cy="6" r="3" /><circle cx="6" cy="25" r="3" /><circle cx="26" cy="25" r="3" /><path d="M14.5 8.6 7.5 22.4M17.5 8.6l7 13.8M9 25h14" /></>}
+  </svg>;
+}
+
+function TopicCards({ items, lang }: { items: { title: Localized; text: Localized; icon?: TopicIcon }[]; lang: Language }) {
   return <div className="info-topic-grid">{items.map((item) => <article className="info-topic-card" key={t(item.title, lang)}>
-    <h3>{t(item.title, lang)}</h3><p><Lines>{t(item.text, lang)}</Lines></p>
+    <h3 className={item.icon ? "info-topic-title-icon" : undefined}>{item.icon && <TopicGlyph icon={item.icon} />}{t(item.title, lang)}</h3><p><Lines>{t(item.text, lang)}</Lines></p>
   </article>)}</div>;
 }
 
@@ -147,9 +157,9 @@ function NextPanel({ title, description, href, linkText }: { title: string; desc
 }
 
 const definitionTopics = [
-  { title: { ko: "공간", en: "Space" }, text: { ko: "밀도가 높아질수록 랙 배치와 이동을 더 세심하게 계획해야 합니다.", en: "As density increases, rack placement and movement call for more careful planning." } },
-  { title: { ko: "흐름", en: "Flow" }, text: { ko: "공기의 흐름과 온도 차이는 공간 전체의 운영에 영향을 줍니다.", en: "Airflow and temperature differences affect operations across the space." } },
-  { title: { ko: "정보", en: "Information" }, text: { ko: "구축과 운영의 정보를 연결해 판단의 바탕을 만듭니다.", en: "Connecting information from installation and operations provides context for decisions." } },
+  { icon: "space" as const, title: { ko: "공간", en: "Space" }, text: { ko: "밀도가 높아질수록 랙 배치와 이동을 더 세심하게 계획해야 합니다.", en: "As density increases, rack placement and movement call for more careful planning." } },
+  { icon: "flow" as const, title: { ko: "흐름", en: "Flow" }, text: { ko: "공기의 흐름과 온도 차이는 공간 전체의 운영에 영향을 줍니다.", en: "Airflow and temperature differences affect operations across the space." } },
+  { icon: "info" as const, title: { ko: "정보", en: "Information" }, text: { ko: "구축과 운영의 정보를 연결해 판단의 바탕을 만듭니다.", en: "Connecting information from installation and operations provides context for decisions." } },
 ];
 
 function DefinitionPage({ lang }: { lang: Language }) {

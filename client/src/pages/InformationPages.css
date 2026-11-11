@@ -159,3 +159,5 @@
 @media (prefers-reduced-motion: reduce) {
   .info-page .info-product-card, .info-page .info-product-card img, .info-page .info-company-link, .info-page .info-button { transition: none; }
 }
+.info-page .info-topic-title-icon { display: flex; align-items: center; gap: 14px; }
+.info-page .info-topic-icon { width: 30px; height: 30px; flex: none; color: var(--info-accent); }

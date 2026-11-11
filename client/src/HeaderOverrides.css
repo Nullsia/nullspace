@@ -106,3 +106,40 @@ p { text-wrap: balance; }
   .info-page .info-team-copy > p:last-child { max-width: 640px; }
   .info-page .info-topic-card p { max-width: none; }
 }
+
+/* Intro: dark grey, with the logo-triangle spotlight inverting to lime. */
+.home-page .intro-section { background: #1f1f1f; color: #f2f2f2; --spot-size: 170px; }
+.home-page .intro-section .intro-layout h2 em { color: #8a8a8a; }
+.home-page .intro-section .intro-copy p { color: #a9a9a9; }
+.home-page .intro-section .underlined-link { border-color: #d8d8d8; color: #f2f2f2; }
+.home-page .intro-section .underlined-link:hover { color: var(--lime); border-color: var(--lime); }
+.home-page .intro-section .stat-row { border-color: #4a4a4a; }
+.home-page .intro-section .stat-row > div + div, .home-page .intro-section .stat-row > div:nth-child(n+3) { border-color: #4a4a4a; }
+.home-page .intro-section .stat-row p { color: #9a9a9a; }
+.home-page .intro-inv { background: var(--lime); color: #090909; }
+.home-page .intro-inv .intro-layout h2 em { color: #4f6614; }
+.home-page .intro-inv .intro-copy p, .home-page .intro-inv .stat-row p { color: #1d2408; }
+.home-page .intro-inv .underlined-link { border-color: #090909; color: #090909; }
+.home-page .intro-inv .stat-row, .home-page .intro-inv .stat-row > div + div, .home-page .intro-inv .stat-row > div:nth-child(n+3) { border-color: rgba(9,9,9,.45); }
+.home-page .stat-row strong small { white-space: nowrap; }
+
+/* Contact band: a round lime spotlight that lights up the wireframe data hall behind the copy. */
+.home-page .contact-band { --spot-size: 190px; }
+.home-page .contact-band-wire { position: absolute; inset: 0; background: url(/images/contact-wire.webp) center / cover no-repeat; opacity: .14; pointer-events: none; }
+.home-page .contact-band-content { z-index: 1; }
+.home-page .contact-inv { background: var(--lime) url(/images/contact-wire-ink.webp) center / cover no-repeat; color: #090909; }
+.home-page .contact-inv .contact-band-grid, .home-page .contact-inv .contact-band-wire { display: none; }
+.home-page .contact-inv p { color: #1d2408; }
+.home-page .contact-inv .button-lime { background: #090909; color: var(--lime); border-color: #090909; }
+
+/* Scenario buttons: hover fills a square lime block with dark text. */
+.home-page .scenario-tabs button { padding: 13px 14px; border-radius: 0; transition: background-color .18s ease, color .18s ease; }
+.home-page .scenario-tabs button:hover { background: var(--lime) !important; color: #090909 !important; }
+.home-page .scenario-tabs button:hover span { color: #090909; }
+.home-page .scenario-tabs button.active:hover { color: #090909; }
+
+/* Product cards: line the three objects up on one baseline and a similar height. */
+.home-page .product-image img { object-position: 50% 50%; }
+.home-page .product-image.mover img { object-position: 42% 50%; }
+.home-page .product-image.prover img { scale: 1.04; translate: 0 -1%; }
+.home-page .product-image.doras img { scale: 1.14; translate: 0 1.5%; }

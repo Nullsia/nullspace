@@ -1,0 +1,16 @@
+@property --spot-r { syntax: "<length>"; inherits: true; initial-value: 0px; }
+.spot { position: relative; --mx: -9999px; --my: -9999px; --spot-r: 0px; --spot-size: 150px; transition: --spot-r .28s ease; }
+.spot-inv { position: absolute; inset: 0; padding: inherit; pointer-events: none; overflow: hidden; z-index: 2; }
+.spot-circle > .spot-inv { clip-path: circle(var(--spot-r) at var(--mx) var(--my)); }
+/* Logo mark triangle: top edge, right edge, and the slanted edge back to the top-left corner (244 x 189). */
+.spot-triangle > .spot-inv {
+  clip-path: polygon(
+    calc(var(--mx) - var(--spot-r)) calc(var(--my) - var(--spot-r) * .774),
+    calc(var(--mx) + var(--spot-r)) calc(var(--my) - var(--spot-r) * .774),
+    calc(var(--mx) + var(--spot-r)) calc(var(--my) + var(--spot-r) * .774),
+    calc(var(--mx) + var(--spot-r) * .49) calc(var(--my) + var(--spot-r) * .774)
+  );
+}
+.spot.is-on { --spot-r: var(--spot-size); }
+@media not ((hover: hover) and (pointer: fine)) { .spot-inv { display: none; } }
+@media (prefers-reduced-motion: reduce) { .spot { transition: none; } }

@@ -1,36 +1,58 @@
 import { useEffect, useState } from "react";
 import { ArrowUpRight } from "lucide-react";
+import ScenarioVisual, { SCENARIO_KEYS } from "./lab/ScenarioVisual";
+import { loadScenario, type TwinScene } from "@/lib/twin";
+import { Lines } from "./Lines";
 import "./ScenarioLab.css";
 
+/*
+ * Solution page scenario lab: the same 3D CFD twin as the home page, driven by the questions
+ * operators actually ask. The three figures come straight from each scenario's scene.json kpi,
+ * compared against the scenario it changes (W3 failure is compared with containment, etc.).
+ */
 const SPACE = "/images/datacenter-space.webp";
+type Kpi = TwinScene["kpi"];
+
 const scenarios = [
-  { ko: "기준 운전", en: "Baseline", koDesc: "현재의 운영 상태를 하나의 기준으로 읽습니다.", enDesc: "Read the current operating state as a clear baseline." },
-  { ko: "AI 랙 증설", en: "AI rack expansion", koDesc: "고밀도 랙이 추가될 때 공간의 변화를 살펴봅니다.", enDesc: "See how the space changes as high-density racks are added." },
-  { ko: "컨테인먼트", en: "Containment", koDesc: "공기 흐름의 경계를 바꾸기 전에 결과를 살펴봅니다.", enDesc: "Explore airflow changes before changing containment." },
-  { ko: "공급 22°C", en: "Supply 22°C", koDesc: "공급 온도 변화가 공간에 미치는 영향을 살펴봅니다.", enDesc: "Explore how a supply-temperature change affects the space." },
-  { ko: "W3 고장", en: "W3 failure", koDesc: "예상치 못한 상황에서도 다음 선택을 준비합니다.", enDesc: "Prepare the next decision for an unexpected situation." },
+  { ko: "기준 운전", en: "Baseline", qKo: "지금 설정 그대로면?", qEn: "What if nothing changes?", dKo: "공급 18℃, 항온항습기 10대", dEn: "18℃ supply, 10 cooling units" },
+  { ko: "AI 랙 증설", en: "AI rack expansion", qKo: "AI 서버 10대(15kW)를 들이면 어디가 먼저 뜨거워지나?", qEn: "Add ten 15 kW AI racks: where does it heat up first?", dKo: "고밀도 랙 10대 추가, IT 부하 926kW", dEn: "10 high-density racks added, 926 kW IT load", compare: 0 },
+  { ko: "컨테인먼트", en: "Containment", qKo: "냉기 통로를 막으면?", qEn: "What if we contain the cold aisles?", dKo: "냉기 통로 양 끝과 위를 막음", dEn: "Cold aisles closed at both ends and on top", compare: 0 },
+  { ko: "공급 22℃", en: "Supply 22℃", qKo: "냉각 설정 온도를 올려도 되나?", qEn: "Can we raise the supply temperature?", dKo: "컨테인먼트 + 공급 온도 18℃ → 22℃", dEn: "Containment + supply 18℃ → 22℃", compare: 2 },
+  { ko: "W3 고장", en: "W3 failure", qKo: "항온항습기 1대가 멈추면 버티나?", qEn: "Can the hall ride out one cooling unit failing?", dKo: "컨테인먼트 + 항온항습기 W3 정지", dEn: "Containment + cooling unit W3 stopped", compare: 2 },
 ];
 
-function Overlay({ scenario }: { scenario: number }) {
-  return <svg className="scenario-overlay" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-    <g stroke="#fff" strokeOpacity=".42" fill="none" strokeWidth=".25"><path d="M12 22H88M12 78H88M12 22V78M88 22V78" strokeDasharray="1 1" /><circle cx="50" cy="50" r="9" /><circle cx="50" cy="50" r="18" strokeDasharray="1 2" /></g>
-    <g stroke="#c6ff3d" fill="none" strokeWidth=".6">
-      {scenario === 0 && <><path d="M20 60h60M20 40h60" strokeDasharray="2 2" /><circle cx="50" cy="50" r="2" /></>}
-      {scenario === 1 && <><rect x="59" y="32" width="7" height="36" /><rect x="68" y="32" width="7" height="36" /><rect x="77" y="32" width="7" height="36" /></>}
-      {scenario === 2 && <><path d="M18 31H82M18 69H82" /><path d="M25 31v38M75 31v38" strokeDasharray="2 2" /></>}
-      {scenario === 3 && <path d="M22 38h42m-5-4 5 4-5 4M30 50h42m-5-4 5 4-5 4M22 62h42m-5-4 5 4-5 4" />}
-      {scenario === 4 && <><circle cx="70" cy="50" r="12" /><path d="M65 45l10 10m0-10L65 55M18 50h35" strokeDasharray="2 2" /></>}
-    </g>
-  </svg>;
+/** 받침이 있으면 "과", 없으면 "와" */
+function withGwa(word: string) {
+  const code = word.charCodeAt(word.length - 1) - 0xac00;
+  return `${word}${code >= 0 && code <= 11171 && code % 28 !== 0 ? "과" : "와"}`;
+}
+
+function Delta({ now, base, unit, better, against, en }: { now: number; base: number; unit: string; better: "down" | "up"; against: string; en: boolean }) {
+  const d = Math.round((now - base) * 10) / 10;
+  if (d === 0) return <span className="kpi-delta">{en ? `Same as ${against}` : `${withGwa(against)} 같음`}</span>;
+  const good = better === "down" ? d < 0 : d > 0;
+  return <span className={`kpi-delta ${good ? "is-good" : "is-bad"}`}>{en ? `${d > 0 ? "+" : ""}${d}${unit} vs ${against}` : `${against} 대비 ${d > 0 ? "+" : ""}${d}${unit}`}</span>;
 }
 
 export default function ScenarioLab({ lang }: { lang: "ko" | "en" }) {
+  const en = lang === "en";
   const [scenario, setScenario] = useState(() => {
     const value = Number(new URLSearchParams(window.location.search).get("scenario"));
     return Number.isInteger(value) && value >= 0 && value < scenarios.length ? value : 0;
   });
+  const [kpi, setKpi] = useState<Record<number, Kpi>>({});
   const selected = scenarios[scenario];
-  const en = lang === "en";
+  const compare = selected.compare;
+
+  useEffect(() => {
+    let alive = true;
+    for (const i of [scenario, compare].filter((x): x is number => x !== undefined)) {
+      if (kpi[i]) continue;
+      loadScenario(SCENARIO_KEYS[i]).then(d => alive && setKpi(m => ({ ...m, [i]: d.scene.kpi }))).catch(err => console.error("[scenario-lab]", err));
+    }
+    return () => { alive = false; };
+  }, [scenario, compare, kpi]);
+
   const selectScenario = (index: number) => {
     setScenario(index);
     const url = new URL(window.location.href);
@@ -39,42 +61,38 @@ export default function ScenarioLab({ lang }: { lang: "ko" | "en" }) {
     window.history.replaceState(window.history.state, "", `${url.pathname}${url.search}${url.hash}`);
   };
 
-  useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    let frame = 0;
-    const update = () => {
-      cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(() => {
-        const visual = document.getElementById("scenario-visual");
-        if (!visual) return;
-        const bounds = visual.getBoundingClientRect();
-        const progress = Math.max(0, Math.min(1, (window.innerHeight - bounds.top) / (window.innerHeight + bounds.height)));
-        visual.style.setProperty("--scan-position", `${Math.round(12 + progress * 76)}%`);
-      });
-    };
-    window.addEventListener("scroll", update, { passive: true });
-    update();
-    return () => { window.removeEventListener("scroll", update); cancelAnimationFrame(frame); };
-  }, []);
+  const now = kpi[scenario];
+  const base = compare !== undefined ? kpi[compare] : undefined;
+  const against = compare !== undefined ? (en ? scenarios[compare].en : scenarios[compare].ko) : "";
+  const cards = [
+    { label: en ? "Max inlet temperature" : "최고 흡기온도", v: now?.inletMaxC, b: base?.inletMaxC, unit: "℃", better: "down" as const, fmt: (x: number) => <>{x.toFixed(1)}<small>℃</small></>, hot: (now?.inletMaxC ?? 0) > 27 },
+    { label: en ? "Racks over 27℃" : "27℃ 초과 랙", v: now?.racksOver27, b: base?.racksOver27, unit: en ? "" : "대", better: "down" as const, fmt: (x: number) => <>{x}<small>{en ? " racks" : "대"}</small></>, hot: (now?.racksOver27 ?? 0) > 0 },
+    { label: "RCI(HI)", v: now?.rciHi, b: base?.rciHi, unit: "%p", better: "up" as const, fmt: (x: number) => <>{x.toFixed(1)}<small>%</small></>, hot: (now?.rciHi ?? 100) < 100, hint: en ? "100% = no overheated racks (ASHRAE index)" : "100% = 과열 랙 없음 (ASHRAE 지표)" },
+  ];
 
   return <section className="scenario-module" id="scenario" aria-labelledby="scenario-heading">
     <div className="scenario-module-heading">
       <h2 id="scenario-heading">{en ? <>See the space<br /><span>from another angle.</span></> : <>공간의 변화를<br /><span>미리 살펴봅니다.</span></>}</h2>
-      <p>{en ? "Explore illustrative scenarios for a virtual data center layout." : "가상의 데이터센터 레이아웃에서 여러 시나리오를 살펴봅니다."}</p>
+      <p><Lines>{en ? "The same 200-rack hall, solved with CFD under different conditions. Answer the questions operators ask before changing a setting." : "같은 200랙 홀에서 조건만 바꿔 열유동 해석을 돌린 결과입니다. 운영팀이 묻는 질문에, 설정을 바꾸기 전에 답합니다."}</Lines></p>
     </div>
     <div className="lab-shell">
       <div className="lab-content">
-        <div className="lab-visual" id="scenario-visual" style={{ backgroundImage: `linear-gradient(0deg, rgba(0,0,0,.35), transparent 55%), url('${SPACE}')` }}>
-          <div className="lab-crosshair" aria-hidden="true"><span>＋</span></div><Overlay scenario={scenario} /><div className="scanline" aria-hidden="true" />
-        </div>
+        <ScenarioVisual scenario={scenario} fallback={SPACE} hint={en ? "Drag to rotate" : "끌어서 돌려 보기"} />
         <div className="lab-panel">
-          <div aria-live="polite"><h3>{en ? selected.en : selected.ko}</h3><p>{en ? selected.enDesc : selected.koDesc}</p></div>
+          <div aria-live="polite"><span className="lab-panel-label">{en ? selected.en : selected.ko}</span><h3>{en ? selected.qEn : selected.qKo}</h3><p><Lines>{en ? selected.dEn : selected.dKo}</Lines></p></div>
           <div className="scenario-tabs" role="group" aria-label={en ? "Select scenario" : "시나리오 선택"}>
-            {scenarios.map((item, i) => <button key={item.en} type="button" onClick={() => selectScenario(i)} className={scenario === i ? "active" : ""} aria-pressed={scenario === i}>{en ? item.en : item.ko}<ArrowUpRight size={14} /></button>)}
+            {scenarios.map((item, i) => <button key={item.en} type="button" onClick={() => selectScenario(i)} className={scenario === i ? "active" : ""} aria-pressed={scenario === i}><span className="tab-q">{en ? item.qEn : item.qKo}</span><ArrowUpRight size={14} /></button>)}
           </div>
         </div>
       </div>
-      <p className="lab-foot">{en ? "Illustrative scenario · not a calculated result or field-validated" : "시나리오 예시 · 계산 결과가 아니며 현장 실측 검증 전"}</p>
+      <p className="lab-foot">{en ? "CFD demo on a 200-rack virtual layout · not yet field-validated" : "200랙 가상 레이아웃 CFD 데모 · 실측 검증 전 결과"}</p>
     </div>
+    <dl className="scenario-kpis" aria-live="polite">
+      {cards.map(c => <div key={c.label} className={`scenario-kpi ${c.hot ? "is-hot" : ""}`}>
+        <dt>{c.label}</dt>
+        <dd className="kpi-value">{c.v === undefined ? "—" : c.fmt(c.v)}</dd>
+        <dd className="kpi-meta">{c.v !== undefined && c.b !== undefined ? <Delta now={c.v} base={c.b} unit={c.unit} better={c.better} against={against} en={en} /> : <span className="kpi-delta">{c.hint ?? (en ? "Reference scenario" : "기준 시나리오")}</span>}</dd>
+      </div>)}
+    </dl>
   </section>;
 }

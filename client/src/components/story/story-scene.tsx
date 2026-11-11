@@ -50,7 +50,7 @@ export interface StorySceneProps {
 }
 
 const FILM = "#d4d4d4";
-const BG = "#05070b";
+const BG = "#0b0b0b";
 const PARTICLE_SPACING = 0.9;
 const FLOW_SPEED = 1.5;
 
@@ -249,10 +249,10 @@ function Room({ data, frame }: { data: TwinData; frame: React.RefObject<Frame> }
   );
   useEffect(() => () => outline.dispose(), [outline]);
   // 타일 재질은 한 벌을 나눠 쓴다. 색 하나만 바꾸면 모든 냉기 통로가 같이 밝아진다
-  const tileMat = useMemo(() => new THREE.MeshBasicMaterial({ color: "#132033" }), []);
+  const tileMat = useMemo(() => new THREE.MeshBasicMaterial({ color: "#1c1c1c" }), []);
   useEffect(() => () => tileMat.dispose(), [tileMat]);
-  const base = useMemo(() => new THREE.Color("#132033"), []);
-  const lit = useMemo(() => new THREE.Color("#0e7490"), []);
+  const base = useMemo(() => new THREE.Color("#1c1c1c"), []);
+  const lit = useMemo(() => new THREE.Color("#5c7a1a"), []);
 
   useFrame(() => {
     // 수집 장면에서 냉기 통로 바닥을 밝혀 로봇 경로를 보여준다
@@ -265,9 +265,9 @@ function Room({ data, frame }: { data: TwinData; frame: React.RefObject<Frame> }
     <group>
       <mesh position={[cx, room.floor - 0.01, cz]} rotation={[-Math.PI / 2, 0, 0]}>
         <planeGeometry args={[room.x, room.y]} />
-        <meshStandardMaterial color="#0c121d" roughness={0.95} />
+        <meshStandardMaterial color="#121212" roughness={0.95} />
       </mesh>
-      <gridHelper args={[60, 60, "#16263b", "#0f1a2a"]} position={[cx, room.floor - 0.02, cz]} />
+      <gridHelper args={[60, 60, "#1e1e1e", "#151515"]} position={[cx, room.floor - 0.02, cz]} />
       {tiles.map((t, i) => {
         const [x, , z] = toThree((t.x0 + t.x1) / 2, (t.y0 + t.y1) / 2, 0);
         return (
@@ -277,7 +277,7 @@ function Room({ data, frame }: { data: TwinData; frame: React.RefObject<Frame> }
         );
       })}
       <lineSegments geometry={outline} position={[cx, (room.floor + room.ceil) / 2, cz]}>
-        <lineBasicMaterial color="#334155" />
+        <lineBasicMaterial color="#3a3a3a" />
       </lineSegments>
       <CrahUnits data={data} />
     </group>
@@ -307,11 +307,11 @@ function Containment({ data, frame }: { data: TwinData; frame: React.RefObject<F
             <mesh position={[0, h / 2, 0]}>
               <boxGeometry args={[b[0] - a[0], h, b[1] - a[1]]} />
               <meshStandardMaterial
-                color="#38bdf8"
+                color="#c6ff3d"
                 transparent
                 opacity={0.4}
                 depthWrite={false}
-                emissive="#0369a1"
+                emissive="#5c7a1a"
                 emissiveIntensity={0.6}
               />
             </mesh>
@@ -452,9 +452,9 @@ export function Slice({ data, clip }: { data: TwinData; clip: Clip }) {
  * 안 잰 점은 작고 옅은 회색이라 필름 위에서 구멍처럼 보이지 않고, 로봇이 지나가면 크게 청록으로 켜지며 잠깐 커졌다 돌아온다.
  * 예전에는 안 잰 점을 짙은 남색 구로 그려 01 겉모습 눈높이에서 검은 얼룩처럼 보였고 센서로 오해받았다(2026-11-10).
  */
-export const PROBE_PENDING = new THREE.Color("#8a96a3");
+export const PROBE_PENDING = new THREE.Color("#8f8f8f");
 export const PROBE_PENDING_SIZE = 0.4;
-export const PROBE_DONE = new THREE.Color("#22d3ee");
+export const PROBE_DONE = new THREE.Color("#c6ff3d");
 /** 잰 점이 커졌다 돌아오는 로봇 이동 거리 [m] */
 const PROBE_POP = 0.6;
 
@@ -568,38 +568,38 @@ function Robot({
       <group ref={body}>
         <mesh position={[0, 0.16, 0]}>
           <boxGeometry args={[0.7, 0.26, 0.5]} />
-          <meshStandardMaterial color="#e2e8f0" roughness={0.35} metalness={0.2} />
+          <meshStandardMaterial color="#e6e6e6" roughness={0.35} metalness={0.2} />
         </mesh>
         {[-0.25, 0.25].map((x) =>
           [-0.2, 0.2].map((z) => (
             <mesh key={`${x}${z}`} position={[x, 0.07, z]} rotation={[Math.PI / 2, 0, 0]}>
               <cylinderGeometry args={[0.07, 0.07, 0.05, 14]} />
-              <meshStandardMaterial color="#334155" />
+              <meshStandardMaterial color="#3a3a3a" />
             </mesh>
           )),
         )}
         <mesh position={[0, 1.05, 0]}>
           <boxGeometry args={[0.07, 1.6, 0.07]} />
-          <meshStandardMaterial color="#94a3b8" metalness={0.4} roughness={0.4} />
+          <meshStandardMaterial color="#a3a3a3" metalness={0.4} roughness={0.4} />
         </mesh>
         {[0.4, 1.1, 1.7].map((h) => (
           <mesh key={h} position={[0, h, 0.09]}>
             <boxGeometry args={[0.2, 0.09, 0.12]} />
-            <meshBasicMaterial color="#22d3ee" />
+            <meshBasicMaterial color="#c6ff3d" />
           </mesh>
         ))}
         {/* 센서 빛 띠: 앞쪽(랙 방향) 양옆으로 펼쳐지는 측정 범위 */}
         <mesh ref={beam} position={[0, 1.05, 0]}>
           <boxGeometry args={[0.18, 1.6, 2.4]} />
           <meshBasicMaterial
-            color="#22d3ee"
+            color="#c6ff3d"
             transparent
             opacity={0.15}
             depthWrite={false}
             blending={THREE.AdditiveBlending}
           />
         </mesh>
-        <pointLight position={[0, 1.2, 0]} color="#22d3ee" intensity={6} distance={4} />
+        <pointLight position={[0, 1.2, 0]} color="#c6ff3d" intensity={6} distance={4} />
       </group>
     </>
   );

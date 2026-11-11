@@ -525,3 +525,9 @@
 }
 
 .subpage .sp-pilot-top > span { font-size: 13px; letter-spacing: 0; }
+
+/* FAQ: larger question and answer text, and a taller answer area. */
+.subpage .sp-faq summary { padding: 24px 22px; }
+.subpage .sp-faq summary strong { font-size: 18px; line-height: 1.55; }
+.subpage .sp-faq > p { padding: 6px 60px 34px 22px; min-height: 120px; font-size: 16px; line-height: 1.85; }
+@media (max-width: 760px) { .subpage .sp-faq summary strong { font-size: 16px; } .subpage .sp-faq > p { padding: 4px 22px 26px 19px; min-height: 0; font-size: 15px; } }

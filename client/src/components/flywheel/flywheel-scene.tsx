@@ -22,8 +22,8 @@ import { BANDS, CrahUnits, RackCabinets, makePaint, type RackPaint } from "@/com
  * @see docs/renewal-2026-11.md
  */
 
-const BG = "#05070b";
-const FILM = new THREE.Color("#1d4b57");
+const BG = "#0b0b0b";
+const FILM = new THREE.Color("#34440f");
 const AMBER = new THREE.Color("#fbbf24");
 /** 링 반지름 [m]. 홀(18 x 26m)을 감싸도록 방 축에 맞춘 타원 */
 const RING_X = 13.5;
@@ -127,19 +127,19 @@ function Ring({ data, landscape, frame }: { data: TwinData; landscape: boolean; 
       const mat = beam.material as THREE.MeshBasicMaterial;
       mat.opacity += ((on ? 0.22 : 0) - mat.opacity) * 0.15;
       const disc = child.children[0] as THREE.Mesh;
-      (disc.material as THREE.MeshBasicMaterial).color.set(on ? "#67e8f9" : "#1e5763");
+      (disc.material as THREE.MeshBasicMaterial).color.set(on ? "#c6ff3d" : "#3b4d12");
     });
   });
 
   return (
     <>
       <mesh geometry={tube}>
-        <meshBasicMaterial color="#1b4f5c" />
+        <meshBasicMaterial color="#34440f" />
       </mesh>
       <instancedMesh ref={comet} args={[undefined, undefined, TRAIL]} frustumCulled={false}>
         <sphereGeometry args={[0.32, 14, 10]} />
         <meshBasicMaterial
-          color="#a5f3fc"
+          color="#dcff8a"
           transparent
           opacity={0.9}
           blending={THREE.AdditiveBlending}
@@ -153,12 +153,12 @@ function Ring({ data, landscape, frame }: { data: TwinData; landscape: boolean; 
             <group key={k} position={p}>
               <mesh rotation={[-Math.PI / 2, 0, 0]}>
                 <ringGeometry args={[0.7, 1.05, 40]} />
-                <meshBasicMaterial color="#1e5763" side={THREE.DoubleSide} />
+                <meshBasicMaterial color="#3b4d12" side={THREE.DoubleSide} />
               </mesh>
               <mesh position={[0, 2.2, 0]}>
                 <cylinderGeometry args={[0.55, 0.9, 4.4, 24, 1, true]} />
                 <meshBasicMaterial
-                  color="#22d3ee"
+                  color="#c6ff3d"
                   transparent
                   opacity={0}
                   depthWrite={false}
@@ -300,29 +300,29 @@ function Robot({ data, routes, frame }: { data: TwinData; routes: Route[]; frame
     <group ref={body} scale={1.6}>
       <mesh position={[0, 0.16, 0]}>
         <boxGeometry args={[0.7, 0.26, 0.5]} />
-        <meshStandardMaterial color="#e2e8f0" roughness={0.35} metalness={0.2} />
+        <meshStandardMaterial color="#e6e6e6" roughness={0.35} metalness={0.2} />
       </mesh>
       <mesh position={[0, 1.05, 0]}>
         <boxGeometry args={[0.07, 1.6, 0.07]} />
-        <meshStandardMaterial color="#94a3b8" />
+        <meshStandardMaterial color="#a3a3a3" />
       </mesh>
       {[0.4, 1.1, 1.7].map((h) => (
         <mesh key={h} position={[0, h, 0.09]}>
           <boxGeometry args={[0.2, 0.09, 0.12]} />
-          <meshBasicMaterial color="#22d3ee" />
+          <meshBasicMaterial color="#c6ff3d" />
         </mesh>
       ))}
       <mesh position={[0, 1.05, 0]}>
         <boxGeometry args={[0.18, 1.6, 2.4]} />
         <meshBasicMaterial
-          color="#22d3ee"
+          color="#c6ff3d"
           transparent
           opacity={0.2}
           depthWrite={false}
           blending={THREE.AdditiveBlending}
         />
       </mesh>
-      <pointLight position={[0, 1.2, 0]} color="#22d3ee" intensity={8} distance={5} />
+      <pointLight position={[0, 1.2, 0]} color="#c6ff3d" intensity={8} distance={5} />
     </group>
   );
 }
@@ -525,27 +525,27 @@ function DataStage({
       <group ref={graphRefs}>
         {graphs.map((g, i) => (
           <lineSegments key={i} geometry={g} visible={false}>
-            <lineBasicMaterial color="#67e8f9" transparent opacity={0} depthWrite={false} />
+            <lineBasicMaterial color="#c6ff3d" transparent opacity={0} depthWrite={false} />
           </lineSegments>
         ))}
       </group>
       <points ref={pkts} geometry={pktGeom} frustumCulled={false}>
-        <pointsMaterial size={0.22} color="#a5f3fc" transparent depthWrite={false} blending={THREE.AdditiveBlending} />
+        <pointsMaterial size={0.22} color="#dcff8a" transparent depthWrite={false} blending={THREE.AdditiveBlending} />
       </points>
       <lineSegments geometry={linkGeom}>
-        <lineBasicMaterial color="#1e5763" />
+        <lineBasicMaterial color="#3b4d12" />
       </lineSegments>
       {sources.map((s, i) => (
         <mesh key={i} position={s}>
           <boxGeometry args={[1.1, 1.1, 1.1]} />
-          <meshStandardMaterial color="#334155" emissive="#0e7490" emissiveIntensity={0.4} />
+          <meshStandardMaterial color="#3a3a3a" emissive="#5c7a1a" emissiveIntensity={0.4} />
         </mesh>
       ))}
       <points ref={streams} geometry={streamGeom} frustumCulled={false}>
         <pointsMaterial
           ref={streamMat}
           size={0.2}
-          color="#67e8f9"
+          color="#c6ff3d"
           transparent
           depthWrite={false}
           blending={THREE.AdditiveBlending}
@@ -763,15 +763,15 @@ function Scene({
       />
       <mesh position={[cx, room.floor - 0.01, cz]} rotation={[-Math.PI / 2, 0, 0]}>
         <planeGeometry args={[room.x, room.y]} />
-        <meshStandardMaterial color="#0c121d" roughness={0.95} />
+        <meshStandardMaterial color="#121212" roughness={0.95} />
       </mesh>
-      <gridHelper args={[80, 80, "#111c2b", "#0b1420"]} position={[cx, room.floor - 0.03, cz]} />
+      <gridHelper args={[80, 80, "#1e1e1e", "#151515"]} position={[cx, room.floor - 0.03, cz]} />
       {tiles.map((t, i) => {
         const [x, , z] = toThree((t.x0 + t.x1) / 2, (t.y0 + t.y1) / 2, 0);
         return (
           <mesh key={i} position={[x, room.floor, z]} rotation={[-Math.PI / 2, 0, 0]}>
             <planeGeometry args={[t.x1 - t.x0, t.y1 - t.y0]} />
-            <meshBasicMaterial color="#132033" />
+            <meshBasicMaterial color="#1c1c1c" />
           </mesh>
         );
       })}

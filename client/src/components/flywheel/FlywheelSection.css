@@ -1,10 +1,10 @@
-.fw-stage { position: relative; aspect-ratio: 16 / 9; overflow: hidden; border: 1px solid #555; background: #05070b; }
+.fw-stage { position: relative; aspect-ratio: 16 / 9; overflow: hidden; border: 1px solid #555; background: #0b0b0b; }
 .fw-layer, .fw-labels { position: absolute; inset: 0; opacity: 0; transition: opacity .7s; }
 .fw-layer.is-ready, .fw-labels.is-ready { opacity: 1; }
 .fw-labels { pointer-events: none; overflow: hidden; }
 .fw-node, .fw-edge, .fw-source { position: absolute; top: 0; left: 0; white-space: nowrap; }
-.fw-node { padding: 6px 14px; border: 1px solid rgba(103,232,249,.3); border-radius: 999px; background: rgba(5,7,11,.8); color: #cffafe; font-size: 14px; font-weight: 700; transition: background .2s, color .2s, border-color .2s; }
-.fw-node.on { background: #67e8f9; border-color: #a5f3fc; color: #05070b; }
+.fw-node { padding: 6px 14px; border: 1px solid rgba(198,255,61,.3); border-radius: 999px; background: rgba(5,7,11,.8); color: #efffcc; font-size: 14px; font-weight: 700; transition: background .2s, color .2s, border-color .2s; }
+.fw-node.on { background: #c6ff3d; border-color: #dcff8a; color: #0b0b0b; }
 .fw-edge { font-size: 12px; color: rgba(255,255,255,.55); }
 .fw-source { font: 12px var(--mono); color: rgba(255,255,255,.7); }
 .fw-hud { position: absolute; left: 14px; top: 14px; display: flex; flex-wrap: wrap; gap: 8px; pointer-events: none; font-size: 12px; }

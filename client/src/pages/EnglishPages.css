@@ -174,3 +174,9 @@
 @media (prefers-reduced-motion: reduce) {
   .en-page *, .en-page *::before, .en-page *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
 }
+
+/* FAQ: larger question and answer text, and a taller answer area. */
+.en-page .en-faq summary { padding: 24px 22px; }
+.en-page .en-faq summary strong { font-size: 18px; line-height: 1.55; }
+.en-page .en-faq > p { padding: 6px 60px 34px 22px; min-height: 120px; font-size: 16px; line-height: 1.85; }
+@media (max-width: 760px) { .en-page .en-faq summary strong { font-size: 16px; } .en-page .en-faq > p { padding: 4px 22px 26px 19px; min-height: 0; font-size: 15px; } }

@@ -7,6 +7,7 @@ import ScenarioVisual from "../components/lab/ScenarioVisual";
 import FlywheelSection from "../components/flywheel/FlywheelSection";
 import "./Home.css";
 import { Lines } from "../components/Lines";
+import Spotlight from "../components/Spotlight";
 
 const HERO = "/images/datacenter-hero.webp";
 const SPACE = "/images/datacenter-space.webp";
@@ -19,12 +20,20 @@ const scenarios = [
   { ko: "W3 고장", en: "W3 failure", code: "05", note: "W3 FAILURE", desc: "예상치 못한 상황에서도 다음 선택을 준비합니다.", enDesc: "Prepare the next decision for an unexpected situation." },
 ];
 
-const stats = [
-  { from: 1, to: 130, prefix: "", unit: "×", ko: "더 커진 데이터센터 공간", en: "Larger data center floor" },
-  { from: 30, to: 5, prefix: "±", unit: "mm", ko: "랙 안착 정밀도", en: "Rack placement precision" },
-  { from: 60, to: 1, prefix: "", unit: "sec", ko: "예측 산출 속도", en: "Prediction speed" },
-  { from: 0, to: 860, prefix: "₩", unit: "M/day", ko: "매출 비용 절감", en: "Revenue cost savings" },
+type Stat = { value?: [string, string]; count?: { from: number; to: number; prefix: string; unit: string }; ko: string; en: string; enValue?: [string, string]; enCount?: Stat["count"] };
+const stats: Stat[] = [
+  { value: ["42", "U"], ko: "수직 3점 계측", en: "Three-point vertical measurement" },
+  { value: ["CFD", "급+"], enValue: ["CFD", "-grade+"], ko: "예측 정확도 로봇 통합관제 시뮬레이션 엔진", en: "Prediction accuracy from a robot-integrated simulation engine" },
+  { count: { from: 60, to: 1, prefix: "", unit: "sec" }, ko: "예측 산출 속도", en: "Prediction speed" },
+  { count: { from: 0, to: 7000, prefix: "", unit: "만원/week" }, enCount: { from: 0, to: 70, prefix: "₩", unit: "M/week" }, ko: "운영 비용 절감", en: "Operating cost savings" },
 ];
+
+function StatValue({ stat, english }: { stat: Stat; english: boolean }) {
+  const count = english ? stat.enCount ?? stat.count : stat.count;
+  if (count) return <CountUp {...count}/>;
+  const [main, unit] = (english ? stat.enValue ?? stat.value : stat.value) ?? ["", ""];
+  return <span>{main}<small>{unit}</small></span>;
+}
 
 function CountUp({ from, to, prefix, unit }: { from: number; to: number; prefix: string; unit: string }) {
   const ref = useRef<HTMLSpanElement>(null);
@@ -48,7 +57,8 @@ function CountUp({ from, to, prefix, unit }: { from: number; to: number; prefix:
     observer.observe(node);
     return () => { observer.disconnect(); cancelAnimationFrame(frame); };
   }, [from, to]);
-  return <span ref={ref} role="text" aria-label={`${prefix}${to}${unit}`}><span aria-hidden="true">{prefix}{Math.round(value)}<small>{unit}</small></span></span>;
+  const text = (n: number) => Math.round(n).toLocaleString("en-US");
+  return <span ref={ref} role="text" aria-label={`${prefix}${text(to)}${unit}`}><span aria-hidden="true">{prefix}{text(value)}<small>{unit}</small></span></span>;
 }
 
 const flow = [
@@ -164,11 +174,11 @@ function Home() {
     </section></HeroScroll>
 
 
-    <section className="intro-section section-pad" id="problem">
+    <Spotlight as="section" shape="triangle" className="intro-section section-pad" invClassName="intro-inv" id="problem">
 
       <div className="intro-layout reveal"><div><h2>{english ? <>What you can't see<br/><em>costs you.</em></> : <>보이지 않는 공간이<br/><em>운영을 바꿉니다.</em></>}</h2></div><div className="intro-copy"><p><Lines>{english ? "Data centers are growing denser. But fixed sensors alone cannot tell the whole story of heat, airflow and the spaces in between." : <>데이터센터는 더 크고 밀도 높아지고 있습니다.<br/>하지만 고정된 센서만으로는 랙 사이의 열과 바람,<br/>공간의 모든 변화를 알 수 없습니다.</>}</Lines></p><p><Lines>{english ? "NULL SPACE reveals the data you need to make the next decision with confidence." : <>NULL SPACE는 보이지 않던 현장의 데이터를 드러내고,<br/>더 정확한 다음 결정을 돕습니다.</>}</Lines></p><a className="underlined-link" href={path("/solution")}>{english ? "The problem we solve" : "우리가 푸는 문제"} <ArrowUpRight size={16}/></a></div></div>
-      <div className="stat-row reveal">{stats.map(stat => <div key={stat.en}><strong><CountUp {...stat}/></strong><p><Lines>{english ? stat.en : stat.ko}</Lines></p></div>)}</div>
-    </section>
+      <div className="stat-row reveal">{stats.map(stat => <div key={stat.en}><strong><StatValue stat={stat} english={english}/></strong><p><Lines>{english ? stat.en : stat.ko}</Lines></p></div>)}</div>
+    </Spotlight>
 
     <section className="scenario-section section-pad" id="scenario">
 
@@ -190,7 +200,7 @@ function Home() {
 
     <section className="news-section section-pad"><div className="news-head reveal"><div><h2>{english ? "Ideas in motion" : "새로운 소식과 생각"}</h2></div><a className="underlined-link" href={path("/news")}>{english ? "All news" : "전체 글 보기"}<ArrowUpRight size={16}/></a></div><div className="news-list reveal"><a href={path("/news/cfd-containment-200-racks")}><strong>{english ? "A closer look at containment in a 200-rack data center" : "200랙 데이터센터, 컨테인먼트를 들여다보다"}</strong><ArrowUpRight size={22}/></a><a href={path("/news/hd-hhi-cooling-pilot")}><strong>{english ? "A joint cooling optimization pilot with HD Hyundai Heavy Industries" : "HD현대중공업과 냉각 최적화 공동 실증"}</strong><ArrowUpRight size={22}/></a></div></section>
 
-    <section className="contact-band" id="contact"><div className="contact-band-grid" aria-hidden="true"/><div className="contact-band-content"><div className="contact-band-text"><h2>{english ? "What could we see in your space?" : "우리 센터는 어떨까요?"}</h2><p><Lines>{english ? "Start a conversation about a clearer, smarter data center." : "더 선명하고 똑똑한 데이터센터를 위한 첫 대화를 시작해 보세요."}</Lines></p></div><a className="button button-lime" href={path("/contact")}>{english ? "Talk to us" : "도입 상담하기"}<ArrowUpRight size={18}/></a></div></section>
+    <Spotlight as="section" shape="circle" className="contact-band" invClassName="contact-inv" id="contact"><div className="contact-band-grid" aria-hidden="true"/><div className="contact-band-wire" aria-hidden="true"/><div className="contact-band-content"><div className="contact-band-text"><h2>{english ? "What could we see in your space?" : "우리 센터는 어떨까요?"}</h2><p><Lines>{english ? "Start a conversation about a clearer, smarter data center." : "더 선명하고 똑똑한 데이터센터를 위한 첫 대화를 시작해 보세요."}</Lines></p></div><a className="button button-lime" href={path("/contact")}>{english ? "Talk to us" : "도입 상담하기"}<ArrowUpRight size={18}/></a></div></Spotlight>
   </div>;
 }
 
