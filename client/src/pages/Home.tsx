@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { ArrowUpRight } from "lucide-react";
 import HeroScroll, { HeroRack } from "../components/HeroScroll";
+import XrayHero from "../components/xray/XrayHero";
+import { hasWebGL } from "@/lib/webgl";
 import ScenarioVisual from "../components/lab/ScenarioVisual";
 import FlywheelSection from "../components/flywheel/FlywheelSection";
 import "./Home.css";
@@ -86,6 +88,7 @@ function Home() {
     window.history.replaceState(window.history.state, "", `${url.pathname}${url.search}${url.hash}`);
   };
   const selected = scenarios[scenario];
+  const [xray, setXray] = useState(() => typeof window !== "undefined" && hasWebGL());
 
   useEffect(() => {
     const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -117,14 +120,14 @@ function Home() {
 
   return <div className="home-page">
     <HeroScroll><section className="hero" id="top" aria-labelledby="hero-title">
-      <div className="hero-art" style={{ backgroundImage: `linear-gradient(90deg, #090909 0%, rgba(9,9,9,.96) 25%, rgba(9,9,9,.43) 60%, rgba(9,9,9,.18) 100%), url('${HERO}')` }}><HeroRack /></div>
+      <div className={`hero-art ${xray ? "has-xray" : ""}`} style={{ backgroundImage: `linear-gradient(90deg, #090909 0%, rgba(9,9,9,.96) 25%, rgba(9,9,9,.43) 60%, rgba(9,9,9,.18) 100%), url('${HERO}')` }}>{xray ? <XrayHero onFail={() => setXray(false)} /> : <HeroRack />}</div>
       <div className="hero-grid" aria-hidden="true"/>
       <div className="hero-copy">
         <h1 id="hero-title">Redefine the space</h1>
         <p className={english ? "hero-title-ko hero-title-en" : "hero-title-ko"}>{english ? "Start with what we measure. Understand the entire space." : "측정한 곳에서 시작해, 공간 전체를 이해합니다."}</p>
         <div className="hero-buttons"><a className="button button-lime" href={path("/solution")}>{english ? "Explore the solution" : "솔루션 살펴보기"}<ArrowUpRight size={18}/></a><a className="button" href={path("/contact")}>Contact<ArrowUpRight size={18}/></a></div>
       </div>
-      <div className="hero-reticle" aria-hidden="true"><div className="reticle-circle"><span/><i/></div></div>
+      {!xray && <div className="hero-reticle" aria-hidden="true"><div className="reticle-circle"><span/><i/></div></div>}
     </section></HeroScroll>
 
 
