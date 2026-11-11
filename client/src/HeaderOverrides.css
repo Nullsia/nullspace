@@ -150,5 +150,5 @@ p { text-wrap: balance; }
 .sp-product-image-prover { background: #eeeeee !important; }
 .home-page .product-image.prover img,
 .info-page .info-product-art-n-prover img,
-.sp-product-image-prover img { object-fit: contain !important; object-position: center !important; padding: 6% 0; box-sizing: border-box; filter: grayscale(1); scale: 1 !important; translate: none !important; }
+.sp-product-image-prover img { object-fit: contain !important; object-position: center !important; padding: 0 !important; box-sizing: border-box; filter: grayscale(1); scale: 1 !important; translate: none !important; }
 .info-page .info-product-art-n-prover::after { display: none; }
