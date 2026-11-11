@@ -1,5 +1,5 @@
 // X-ray data hall loop for the home hero, ported from the standalone loop page.
-// Ambient 12 s camera loop: the photoreal hall peels away into the x-ray wireframe around the lime rack.
+// Ambient 12 s loop: starts at the lime rack, pulls out to the photoreal hall, a lime scan sweeps out from the rack, then pushes back in.
 // Scroll progress (0..1) pushes the camera through the peel toward the lime rack.
 /* eslint-disable */
 // @ts-nocheck
@@ -220,10 +220,12 @@ const U = {
   uCam: { value: new THREE.Vector3() }, uFwd: { value: new THREE.Vector3() },
   uFocus: { value: 10 }, uAper: { value: 0.3 }, uLayer: { value: 0 }, uCut: { value: 0.3 },
   uGlow: { value: 0 }, uLime: { value: new THREE.Vector3(LIME.r, LIME.g, LIME.b) }, uT: { value: 0 }, uPx: { value: 1000 }, uReach: { value: 80 },
+  uScanR: { value: 0 }, uScanK: { value: 0 }, uLink: { value: 0 }, uOrigin: { value: new THREE.Vector2(tx, tz) },
 };
 const COMMON = /* glsl */`
 uniform vec3 uCam; uniform vec3 uFwd; uniform float uFocus; uniform float uAper; uniform float uLayer;
 uniform float uCut; uniform float uMirror; uniform float uGlow; uniform vec3 uLime; uniform float uReach; uniform float uSolid;
+uniform float uScanR; uniform float uScanK; uniform float uLink; uniform vec2 uOrigin;
 float dofW(float dz){
   float c = clamp(abs(dz - uFocus) * uAper / max(dz, 0.4), 0., 1.);
   float wS = 1. - smoothstep(0.10, 0.40, c);
@@ -242,6 +244,15 @@ vec3 shade(vec3 W, float br, float lime){
   float b = br * 0.8 * fog * cut * reach;
   float lg = lime * clamp(uGlow * 3., 0., 1.);
   vec3 col = mix(vec3(b), uLime * min(b * (1.0 + 1.6 * uGlow), 0.8), lg);
+  // 측정한 랙에서 퍼지는 라임 스캔: 파면이 지나가면 잠깐 연결된 채로 남는다
+  float dS = length(W.xz - uOrigin) + abs(W.y - 1.1) * 0.25;
+  float fr = exp(-pow((dS - uScanR) / 0.8, 2.)) * uScanK;
+  float inside = 1. - smoothstep(uScanR - 1.0, uScanR + 0.3, dS);
+  float sf = exp(-max(dist - 6., 0.) * 0.012);
+  float sb = br * 0.8 * cut * reach * sf;
+  float trail = inside * exp(-max(uScanR - dS, 0.) / 3.) * uScanK;
+  float wS = clamp(fr * 1.6 + trail * 0.5, 0., 1.) * (1. - lg);
+  col = mix(col, uLime * sb * (1.0 + 3.0 * fr), wS);
   if (uMirror > 0.5) col *= 0.15 * exp(W.y * 0.8);
   return col * dofW(dz);
 }`;
@@ -347,6 +358,25 @@ const halo = new THREE.Mesh(new THREE.PlaneGeometry(2.6, 3.8), glowMat(0.045, "f
 halo.position.set(tx, 1.1, tz); halo.frustumCulled = false; scene.add(halo);
 const pool = new THREE.Mesh(new THREE.PlaneGeometry(4.5, 4.5), glowMat(0.05, "float a = exp(-dot(q*vec2(1.0,1.5), q*vec2(1.0,1.5)) * 3.0);"));
 pool.rotation.x = -Math.PI / 2; pool.position.set(tx, 0.006, tz + 0.9); pool.frustumCulled = false; scene.add(pool);
+// 바닥을 따라 번지는 스캔 링
+const ringMat = new THREE.ShaderMaterial({
+  uniforms: { ...U, uMirror: { value: 0 } }, transparent: true, depthTest: false, depthWrite: false, blending: THREE.AdditiveBlending,
+  vertexShader: `varying vec3 vW; void main(){ vec4 w = modelMatrix * vec4(position,1.); vW = w.xyz; gl_Position = projectionMatrix * viewMatrix * w; }`,
+  fragmentShader: COMMON + `varying vec3 vW;
+    void main(){ vec3 d3 = vW - uCam; float dz = dot(d3, uFwd);
+      float r = length(vW.xz - uOrigin);
+      float ring = exp(-pow((r - uScanR) / 0.45, 2.)) + 0.35 * exp(-pow((r - uScanR + 1.6) / 1.2, 2.));
+      float wash = (1. - smoothstep(uScanR - 1., uScanR, r)) * exp(-max(uScanR - r, 0.) / 3.5) * uScanK;
+      float g = max(1. - abs(fract(vW.x / 0.6) - 0.5) * 40., 0.) + max(1. - abs(fract(vW.z / 0.6) - 0.5) * 40., 0.);
+      float edge = 1. - smoothstep(26., 34., r);
+      float cut = smoothstep(uCut, uCut + 0.25, dz);
+      float reach = uSolid > 0.5 ? 1. : 1. - smoothstep(uReach - 6., uReach, dz);
+      float a = (ring * 0.20 * uScanK + wash * (0.03 + 0.12 * g)) * edge * cut * reach;
+      gl_FragColor = vec4(uLime * a * (uSolid > 0.5 ? 1. : dofW(dz)), 1.); }`,
+});
+const scanFloor = new THREE.Mesh(new THREE.PlaneGeometry(80, 80), ringMat);
+scanFloor.rotation.x = -Math.PI / 2; scanFloor.position.set(tx, 0.008, tz); scanFloor.frustumCulled = false; scene.add(scanFloor);
+const ringMatSolid = ringMat.clone(); ringMatSolid.uniforms = { ...U, uMirror: { value: 0 }, uSolid: { value: 1 } }; ringMatSolid.depthTest = true;
 
 
 // ───────── 실사 장면: 같은 공간의 불투명 랙, 반사 바닥, 유리 구조선 (투시 전에 보이는 모습) ─────────
@@ -387,13 +417,33 @@ function rackFront(seed) {
   });
   const t = new THREE.CanvasTexture(base), e = new THREE.CanvasTexture(emi);
   t.colorSpace = e.colorSpace = THREE.SRGBColorSpace; t.anisotropy = e.anisotropy = 8;
-  return new THREE.MeshStandardMaterial({ map: t, emissiveMap: e, emissive: "#ffffff", emissiveIntensity: 2.4, metalness: 0.55, roughness: 0.42, clippingPlanes: [PEEL] });
+  return scanify(new THREE.MeshStandardMaterial({ map: t, emissiveMap: e, emissive: "#ffffff", emissiveIntensity: 2.4, metalness: 0.55, roughness: 0.42, clippingPlanes: [PEEL] }));
 }
 const rearTex = new THREE.CanvasTexture(cnv(64, 235, (g, w, h) => { g.fillStyle = "#0a0b0c"; g.fillRect(0, 0, w, h); g.fillStyle = "#1c1d20"; for (let y = 8; y < h - 8; y += 4) for (let x = 6; x < w - 6; x += 4) g.fillRect(x, y, 2, 2); }));
 rearTex.colorSpace = THREE.SRGBColorSpace;
-const sideM = new THREE.MeshStandardMaterial({ color: "#101113", metalness: 0.7, roughness: 0.35, clippingPlanes: [PEEL] });
-const topM = new THREE.MeshStandardMaterial({ color: "#16171a", metalness: 0.6, roughness: 0.5, clippingPlanes: [PEEL] });
-const rearM = new THREE.MeshStandardMaterial({ map: rearTex, metalness: 0.6, roughness: 0.45, clippingPlanes: [PEEL] });
+const sideM = scanify(new THREE.MeshStandardMaterial({ color: "#101113", metalness: 0.7, roughness: 0.35, clippingPlanes: [PEEL] }));
+const topM = scanify(new THREE.MeshStandardMaterial({ color: "#16171a", metalness: 0.6, roughness: 0.5, clippingPlanes: [PEEL] }));
+const rearM = scanify(new THREE.MeshStandardMaterial({ map: rearTex, metalness: 0.6, roughness: 0.45, clippingPlanes: [PEEL] }));
+// 스캐너 빛: 외관 전경에서 측정한 랙 자리부터 바깥으로 스쳐 지나간다
+function scanify(mat) {
+  mat.onBeforeCompile = (sh) => {
+    Object.assign(sh.uniforms, { uScanR: U.uScanR, uScanK: U.uScanK, uOrigin: U.uOrigin, uLimeS: U.uLime });
+    sh.vertexShader = sh.vertexShader.replace("#include <common>", "#include <common>\nvarying vec3 vScanW;")
+      .replace("#include <project_vertex>", `#include <project_vertex>
+        vec4 sw = vec4(transformed, 1.);
+        #ifdef USE_INSTANCING
+          sw = instanceMatrix * sw;
+        #endif
+        vScanW = (modelMatrix * sw).xyz;`);
+    sh.fragmentShader = sh.fragmentShader.replace("#include <common>", "#include <common>\nvarying vec3 vScanW; uniform float uScanR; uniform float uScanK; uniform vec2 uOrigin; uniform vec3 uLimeS;")
+      .replace("#include <emissivemap_fragment>", `#include <emissivemap_fragment>
+        float sd = length(vScanW.xz - uOrigin) + abs(abs(vScanW.y) - 1.1) * 0.25;
+        float sfr = exp(-pow((sd - uScanR) / 0.35, 2.));
+        float str = (1. - smoothstep(uScanR - 0.6, uScanR + 0.2, sd)) * exp(-max(uScanR - sd, 0.) / 2.5);
+        totalEmissiveRadiance += uLimeS * (sfr * 0.55 + str * 0.04) * uScanK;`);
+  };
+  return mat;
+}
 const STRIP = new THREE.MeshBasicMaterial({ color: new THREE.Color(2.4, 2.4, 2.4), clippingPlanes: [PEEL] });
 const mirror = new THREE.Group(); mirror.scale.y = -1; solid.add(mirror);
 {
@@ -417,6 +467,8 @@ const mirror = new THREE.Group(); mirror.scale.y = -1; solid.add(mirror);
   // 광택 바닥: 아래 거울상 위에 반투명 검정 판
   const floor = new THREE.Mesh(new THREE.PlaneGeometry(140, 140), new THREE.MeshStandardMaterial({ color: "#000000", metalness: 0.0, roughness: 1.0, envMapIntensity: 0, transparent: true, opacity: 0.8, clippingPlanes: [PEEL] }));
   floor.rotation.x = -Math.PI / 2; floor.renderOrder = 2; solid.add(floor);
+  const sf = new THREE.Mesh(new THREE.PlaneGeometry(80, 80), ringMatSolid);
+  sf.rotation.x = -Math.PI / 2; sf.position.set(tx, 0.012, tz); sf.renderOrder = 3; sf.frustumCulled = false; solid.add(sf);
 }
 // 구조선과 유리면: 와이어와 같은 형상을 깊이 검사하며 그린다 (랙 뒤는 가려진다)
 const mkSolid = (o, mirror, order) => {
@@ -442,10 +494,12 @@ const LOOK_A = new THREE.Vector3(-3.0, 2.4, -2.5), LOOK_B = new THREE.Vector3(tx
 const sm = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
 const tmpL = new THREE.Vector3();
 function setTime(t) {               // t: 0..1 (한 루프)
+  const so = (x) => { x = Math.min(1, Math.max(0, x)); return x * x * (3 - 2 * x); };   // 빠져나올 때는 조금 더 일찍 움직인다
+  const ss = (x) => { x = Math.min(1, Math.max(0, x)); return x * x * x * (x * (6 * x - 15) + 10); };
+  // e = 1: 라임 랙 앞(내부), e = 0: 외관. 0~0.05 머묾 → 0.05~0.64 빠져나옴 → 0.64~0.70 머묾 → 0.70~1 다시 들어감
+  const e0 = t < 0.05 ? 1 : t < 0.64 ? 1 - so((t - 0.05) / 0.59) : t < 0.70 ? 0 : ss((t - 0.70) / 0.30);
+  // Scrolling the hero pushes the camera back in through the peel toward the lime rack, whatever the loop is doing.
   const s = Math.max(0, Math.min(1, getProgress()));
-  const p = 0.5 - 0.5 * Math.cos(2 * Math.PI * t);
-  const e0 = p * p * (3 - 2 * p) * 0.5 + p * 0.5;
-  // Scrolling pushes the camera further into the hall, through the x-ray peel, toward the lime rack.
   const e = e0 + (0.92 - e0) * s;
   cam.position.copy(path.getPoint(e));
   tmpL.copy(LOOK_A).lerp(LOOK_B, sm(0.0, 0.9, e));
@@ -456,6 +510,11 @@ function setTime(t) {               // t: 0..1 (한 루프)
   U.uFocus.value = TFRONT.clone().sub(cam.position).dot(U.uFwd.value);
   U.uAper.value = 1.25 * sm(0.45, 1.0, e);
   U.uGlow.value = sm(0.5, 0.85, e) * (0.88 + 0.12 * Math.sin(2 * Math.PI * 3 * t));
+  // 외관 전경이 드러난 뒤, 측정한 랙 자리에서 바깥으로 스캐너 빛이 한 번 스쳐 지나간다
+  const sl = Math.min(1, Math.max(0, (t - 0.45) / 0.24));
+  U.uScanR.value = 36 * (sl * sl * (3 - 2 * sl) * 0.6 + sl * 0.4);
+  U.uScanK.value = sm(0.44, 0.47, t) * (1 - sm(0.64, 0.70, t));
+  U.uLink.value = 0;
   // 외관 사진: 천천히 밀려 들어가다가, 투시가 깊어지며 와이어 내부로 넘어간다
   U.uReach.value = 80 * Math.pow(sm(0.2, 0.56, e), 1.4);
   outMat.uniforms.imgK.value = 0;
@@ -560,7 +619,7 @@ function draw() {
 
 const fit = () => { const w = Math.max(1, host.clientWidth), h = Math.max(1, host.clientHeight); if (w !== W || h !== H) resize(w, h); };
 fit();
-const ro = new ResizeObserver(() => { fit(); if (!running) { setTime(0.62); draw(); } });
+const ro = new ResizeObserver(() => { fit(); if (!running) { setTime(0); draw(); } });
 ro.observe(host);
 let running = false, raf = 0, visible = true;
 const t0 = performance.now();
@@ -569,9 +628,9 @@ const start = () => { if (reduced || running || !visible) return; running = true
 const stop = () => { running = false; if (raf) cancelAnimationFrame(raf); raf = 0; };
 const io = new IntersectionObserver(([e]) => { visible = e.isIntersecting; visible ? start() : stop(); });
 io.observe(host);
-if (reduced) { setTime(0.62); draw(); } else start();
+if (reduced) { setTime(0); draw(); } else start();
 return {
-  redraw() { if (!running) { setTime(0.62); draw(); } },
+  redraw() { if (!running) { setTime(0); draw(); } },
   dispose() {
     stop(); ro.disconnect(); io.disconnect();
     [rtS, rtM, rtF, rtM2, rtF2, rtC, rtSolid].forEach(r => r && r.dispose()); bloom?.dispose();
