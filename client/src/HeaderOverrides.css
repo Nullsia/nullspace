@@ -141,5 +141,14 @@ p { text-wrap: balance; }
 /* Product cards: line the three objects up on one baseline and a similar height. */
 .home-page .product-image img { object-position: 50% 50%; }
 .home-page .product-image.mover img { object-position: 42% 50%; }
-.home-page .product-image.prover img { scale: 1.04; translate: 0 -1%; }
+
 .home-page .product-image.doras img { scale: 1.14; translate: 0 1.5%; }
+
+/* N-PROVER: the whole robot is shown on its studio backdrop, in black and white, in every card. */
+.home-page .product-image.prover,
+.info-page .info-product-art-n-prover,
+.sp-product-image-prover { background: #eeeeee !important; }
+.home-page .product-image.prover img,
+.info-page .info-product-art-n-prover img,
+.sp-product-image-prover img { object-fit: contain !important; object-position: center !important; padding: 6% 0; box-sizing: border-box; filter: grayscale(1); scale: 1 !important; translate: none !important; }
+.info-page .info-product-art-n-prover::after { display: none; }
