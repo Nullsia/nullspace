@@ -8,7 +8,7 @@ import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPa
 import { FullScreenQuad } from "three/examples/jsm/postprocessing/Pass.js";
 import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
 
-export function createXrayLoop(host: HTMLElement, { getProgress, reduced }: { getProgress: () => number; reduced: boolean }) {
+export function createXrayLoop(host: HTMLElement, { reduced }: { reduced: boolean }) {
 
 
 // ───────── 설정 ─────────
@@ -620,21 +620,21 @@ fit();
 const ro = new ResizeObserver(() => { fit(); if (!running) { setTime(0); draw(); } });
 ro.observe(host);
 let running = false, raf = 0, visible = true;
-// At the top of the page the loop plays on its own. Scrolling the hero scrubs the pull-out instead:
-// progress 0..1 runs the loop from the first scene to the end of the exterior shot (t = 0.70),
-// so the whole move outside is seen before the page moves on. Back at the top the loop restarts from the first scene.
-const SCRUB_END = 0.70;
-let t0 = performance.now(), last = t0, shown = 0, scrubbing = false;
+// The loop plays on its own. playOut() runs it forward at its own pace to the end of the exterior shot (t = 0.70)
+// and holds there; the hero blocks page scroll until that resolves, so the whole move outside is always seen.
+// resetLoop() restarts the loop from the first scene.
+const OUT_END = 0.70;
+let t0 = performance.now(), last = t0, shown = 0, mode: "loop" | "out" | "hold" = "loop", outDone: (() => void) | null = null;
 const frame = () => {
   raf = 0; if (!running) return;
-  const now = performance.now(), dt = Math.min(0.1, (now - last) / 1000); last = now;
-  const s = Math.max(0, Math.min(1, getProgress()));
-  if (s > 0.002) {
-    if (!scrubbing) { scrubbing = true; if (shown > SCRUB_END) shown = 0; }
-    shown += (s * SCRUB_END - shown) * Math.min(1, dt * 7);
-  } else {
-    if (scrubbing) { scrubbing = false; t0 = now - shown * LOOP * 1000; if (shown < 0.01) t0 = now; }
-    shown = ((now - t0) / 1000 / LOOP) % 1;
+  const now = performance.now(), dt = Math.min(0.25, (now - last) / 1000); last = now;
+  if (mode === "loop") shown = ((now - t0) / 1000 / LOOP) % 1;
+  else if (mode === "out") {
+    // Finish any push-in quickly, then play the pull-out a little faster than the ambient loop.
+    const speed = shown > OUT_END ? 3.2 : 1.45;
+    const next = shown + (dt / LOOP) * speed;
+    if (shown <= OUT_END && next >= OUT_END) { shown = OUT_END; mode = "hold"; outDone?.(); outDone = null; }
+    else shown = next % 1;
   }
   setTime(shown); draw(); raf = requestAnimationFrame(frame);
 };
@@ -644,6 +644,13 @@ const io = new IntersectionObserver(([e]) => { visible = e.isIntersecting; visib
 io.observe(host);
 if (reduced) { setTime(0); draw(); } else start();
 return {
+  playOut() {
+    if (mode === "hold") return Promise.resolve();
+    mode = "out";
+    if (!running) { running = true; last = performance.now(); raf = requestAnimationFrame(frame); }
+    return new Promise<void>((res) => { outDone = res; });
+  },
+  resetLoop() { mode = "loop"; t0 = performance.now(); outDone?.(); outDone = null; },
   redraw() { if (!running) { setTime(0); draw(); } },
   dispose() {
     stop(); ro.disconnect(); io.disconnect();
