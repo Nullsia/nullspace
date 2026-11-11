@@ -224,7 +224,7 @@ function viewFor(data: TwinData): LabView {
   return { target: c.clone(), pos: c.clone().add(new THREE.Vector3(-17, 18.7, 22)) };
 }
 
-function Controls({ view, interactive, reduced }: { view: LabView; interactive: boolean; reduced: boolean }) {
+function Controls({ view, interactive, touch, reduced }: { view: LabView; interactive: boolean; touch: boolean; reduced: boolean }) {
   const { camera, gl } = useThree();
   const controls = useMemo(() => new OrbitControls(camera, gl.domElement), [camera, gl]);
   const flying = useRef(true);
@@ -234,7 +234,14 @@ function Controls({ view, interactive, reduced }: { view: LabView; interactive: 
     controls.enableDamping = true;
     controls.maxPolarAngle = Math.PI / 2.15;
     controls.minPolarAngle = Math.PI / 8;
-    controls.enabled = interactive;
+    controls.enabled = interactive || touch;
+    if (touch && !interactive) {
+      // Phones: one finger still scrolls the page; two fingers pinch to zoom into the hall and turn it.
+      controls.enableZoom = true;
+      controls.minDistance = 3;
+      controls.maxDistance = 60;
+      controls.touches = { ONE: -1 as unknown as THREE.TOUCH, TWO: THREE.TOUCH.DOLLY_ROTATE };
+    }
     // A drag takes over from the scripted camera until the next scenario.
     const stop = () => { flying.current = false; };
     controls.addEventListener("start", stop);
@@ -242,7 +249,7 @@ function Controls({ view, interactive, reduced }: { view: LabView; interactive: 
       controls.removeEventListener("start", stop);
       controls.dispose();
     };
-  }, [controls, interactive]);
+  }, [controls, interactive, touch]);
   useEffect(() => {
     flying.current = true;
     if (reduced) { camera.position.copy(view.pos); controls.target.copy(view.target); controls.update(); }
@@ -259,7 +266,7 @@ function Controls({ view, interactive, reduced }: { view: LabView; interactive: 
   return null;
 }
 
-function Scene({ data, interactive, reduced, motion }: { data: TwinData; interactive: boolean; reduced: boolean; motion: boolean }) {
+function Scene({ data, interactive, touch, reduced, motion }: { data: TwinData; interactive: boolean; touch: boolean; reduced: boolean; motion: boolean }) {
   const clip = useMemo(() => {
     const c = makeClip();
     // 띠 없이 전부 온도 색으로 보인다
@@ -280,7 +287,7 @@ function Scene({ data, interactive, reduced, motion }: { data: TwinData; interac
       <Highlights data={data} />
       <Flow key={data.scene.key} data={data} clip={clip} />
       <Slice key={`s-${data.scene.key}`} data={data} clip={clip} />
-      <Controls view={view} interactive={interactive} reduced={reduced} />
+      <Controls view={view} interactive={interactive} touch={touch} reduced={reduced} />
     </>
   );
 }
@@ -292,6 +299,7 @@ export default function LabScene({
   reduced,
   onReady,
   motion = false,
+  touch = false,
 }: {
   scenario: ScenarioKey;
   active: boolean;
@@ -300,6 +308,8 @@ export default function LabScene({
   onReady?: () => void;
   /** 솔루션 페이지 연출: S3/S4 색 흐름, S5 멈춘 항온항습기 라임 */
   motion?: boolean;
+  /** Touch device: pinch to zoom, one finger keeps scrolling the page */
+  touch?: boolean;
 }) {
   // 새 시나리오를 받는 동안에는 이전 장면을 그대로 둔다 (빈 화면 깜빡임 방지)
   const [data, setData] = useState<TwinData | null>(null);
@@ -328,7 +338,7 @@ export default function LabScene({
       }}
       style={{ touchAction: interactive ? "none" : "pan-y" }}
     >
-      <Scene data={data} interactive={interactive} reduced={reduced} motion={motion} />
+      <Scene data={data} interactive={interactive} touch={touch} reduced={reduced} motion={motion} />
     </Canvas>
   );
 }
