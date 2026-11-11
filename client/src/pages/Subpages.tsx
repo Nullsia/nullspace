@@ -54,8 +54,8 @@ export function SolutionPage() {
     <section className="sp-section sp-products" id="products">
       <SectionHead title={<>구축에서 운영까지,<br/>하나의 흐름으로.</>} description="각 단계의 과제를 분리하지 않고 연결합니다. 물리적 작업과 운영 정보를 하나의 시스템으로 바라봅니다."/>
       <div className="sp-product-grid">
-        <article className="sp-product"><div className="sp-product-image"><img src="/images/n-mover.jpg" alt="데이터센터 랙 이동을 위한 N-Mover 이미지"/></div><div className="sp-product-copy"><div><h3>N-Mover</h3></div><p><Lines>랙 구축과 이동 과정의 복잡함을 줄이기 위한 솔루션입니다. 데이터센터의 물리적인 변화를 더 체계적으로 준비합니다.</Lines></p></div></article>
-        <article className="sp-product"><div className="sp-product-image sp-product-image-tall"><img src="/images/n-prover.jpg" alt="데이터센터 운영을 위한 N-Prover 이미지"/></div><div className="sp-product-copy"><div><h3>N-Prover</h3></div><p><Lines>운영 현장의 상태를 살피고 필요한 정보를 연결하는 솔루션입니다. 공간을 더 깊이 이해하는 운영을 지향합니다.</Lines></p></div></article>
+        <article className="sp-product"><div className="sp-product-image"><img src="/images/n-mover.jpg" alt="데이터센터 랙 이동을 위한 N-MOVER 이미지"/></div><div className="sp-product-copy"><div><h3>N-MOVER</h3></div><p><Lines>랙 구축과 이동 과정의 복잡함을 줄이기 위한 솔루션입니다. 데이터센터의 물리적인 변화를 더 체계적으로 준비합니다.</Lines></p></div></article>
+        <article className="sp-product"><div className="sp-product-image sp-product-image-tall"><img src="/images/n-prover.jpg" alt="데이터센터 운영을 위한 N-PROVER 이미지"/></div><div className="sp-product-copy"><div><h3>N-PROVER</h3></div><p><Lines>운영 현장의 상태를 살피고 필요한 정보를 연결하는 솔루션입니다. 공간을 더 깊이 이해하는 운영을 지향합니다.</Lines></p></div></article>
         <article className="sp-product sp-product-wide"><div className="sp-doras-visual" aria-hidden="true"><div className="sp-doras-orbit sp-orbit-one"/><div className="sp-doras-orbit sp-orbit-two"/><div className="sp-doras-core">N<span>·</span></div></div><div className="sp-product-copy"><div><h3>N-DORAS</h3></div><p><Lines>구축과 운영에서 만들어지는 정보를 연결하는 통합 관리 솔루션입니다. 데이터센터를 하나의 유기적인 시스템으로 바라봅니다.</Lines></p></div></article>
       </div>
     </section>

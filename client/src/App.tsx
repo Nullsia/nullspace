@@ -63,8 +63,8 @@ function Header({ lang, path }: { lang: Language; path: string }) {
             <a href={localPath("/solution", lang)} onClick={closeMenu}>{en ? "Definition" : "솔루션 소개"}</a>
             <a className="nav-product-heading" href={localPath("/solution/product", lang)} onClick={closeMenu}>{en ? "Product" : "제품"}</a>
             <div className="nav-sublist" aria-label={en ? "Products" : "제품 목록"}>
-              <a href={localPath("/solution/product/n-mover", lang)} onClick={closeMenu}>N-Mover</a>
-              <a href={localPath("/solution/product/n-prover", lang)} onClick={closeMenu}>N-Prover</a>
+              <a href={localPath("/solution/product/n-mover", lang)} onClick={closeMenu}>N-MOVER</a>
+              <a href={localPath("/solution/product/n-prover", lang)} onClick={closeMenu}>N-PROVER</a>
               <a href={localPath("/solution/product/n-doras", lang)} onClick={closeMenu}>N-DORAS</a>
             </div>
           </div>

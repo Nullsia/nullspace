@@ -183,7 +183,7 @@ export function toThree(x: number, y: number, z: number): [number, number, numbe
   return [x, z, -y];
 }
 
-/** 로봇이 측정하는 흡입 높이 [m, 바닥 기준]. N-Prover 상, 중, 하 */
+/** 로봇이 측정하는 흡입 높이 [m, 바닥 기준]. N-PROVER 상, 중, 하 */
 export const PROBE_HEIGHTS = [0.4, 1.1, 1.7];
 
 export interface Patrol {

@@ -34,13 +34,13 @@ const products: Record<ProductPage, {
   perspectives: { title: Localized; text: Localized }[];
 }> = {
   "n-mover": {
-    name: "N-Mover",
+    name: "N-MOVER",
     category: { ko: "구축과 이동", en: "Build and movement" },
     description: { ko: "랙 구축과 이동 과정의 복잡함을 줄이기 위한 솔루션입니다.", en: "A solution for navigating the complexity of rack installation and movement." },
     headline: { ko: "공간의 변화를 더 체계적으로 준비합니다.", en: "Prepare for changes in the space more systematically." },
-    body: { ko: "N-Mover는 데이터센터의 랙 구축과 이동 과정에 주목합니다. 물리적인 변화를 공간과 운영의 맥락에서 함께 살펴보며, 더 나은 작업의 흐름을 고민합니다.", en: "N-Mover focuses on rack installation and movement in data centers. It considers physical change in the context of the space and its operations, toward a more considered workflow." },
+    body: { ko: "N-MOVER는 데이터센터의 랙 구축과 이동 과정에 주목합니다. 물리적인 변화를 공간과 운영의 맥락에서 함께 살펴보며, 더 나은 작업의 흐름을 고민합니다.", en: "N-MOVER focuses on rack installation and movement in data centers. It considers physical change in the context of the space and its operations, toward a more considered workflow." },
     image: "/images/n-mover.jpg",
-    imageAlt: { ko: "데이터센터 랙 이동을 위한 N-Mover", en: "N-Mover for moving data center racks" },
+    imageAlt: { ko: "데이터센터 랙 이동을 위한 N-MOVER", en: "N-MOVER for moving data center racks" },
     perspectives: [
       { title: { ko: "랙 구축", en: "Rack installation" }, text: { ko: "공간에 새로운 랙이 더해지는 과정을 살펴봅니다.", en: "Consider the process of adding racks to a space." } },
       { title: { ko: "물리적 이동", en: "Physical movement" }, text: { ko: "랙이 이동할 때 필요한 작업과 공간의 관계에 주목합니다.", en: "Focus on the relationship between the work and space involved in moving racks." } },
@@ -48,13 +48,13 @@ const products: Record<ProductPage, {
     ],
   },
   "n-prover": {
-    name: "N-Prover",
+    name: "N-PROVER",
     category: { ko: "공간의 관찰", en: "Observing space" },
     description: { ko: "운영 현장의 상태를 살피고 필요한 정보를 연결하는 솔루션입니다.", en: "A solution for observing conditions in the operating environment and connecting relevant information." },
     headline: { ko: "운영의 공간을 더 가까이 살펴봅니다.", en: "Take a closer look at the space in operation." },
-    body: { ko: "N-Prover는 데이터센터 공간의 측정과 운영 현장의 관찰에 주목합니다. 공간을 더 깊이 이해하고 다음 판단에 필요한 정보를 살피는 접근입니다.", en: "N-Prover focuses on measuring data center space and observing the operating environment. It is an approach to understanding the space more deeply and considering information for the next decision." },
+    body: { ko: "N-PROVER는 데이터센터 공간의 측정과 운영 현장의 관찰에 주목합니다. 공간을 더 깊이 이해하고 다음 판단에 필요한 정보를 살피는 접근입니다.", en: "N-PROVER focuses on measuring data center space and observing the operating environment. It is an approach to understanding the space more deeply and considering information for the next decision." },
     image: "/images/n-prover.jpg",
-    imageAlt: { ko: "데이터센터 공간을 측정하는 N-Prover", en: "N-Prover for measuring data center space" },
+    imageAlt: { ko: "데이터센터 공간을 측정하는 N-PROVER", en: "N-PROVER for measuring data center space" },
     perspectives: [
       { title: { ko: "공간 측정", en: "Spatial measurement" }, text: { ko: "현장의 공간을 살펴보는 것에서 시작합니다.", en: "Start by examining the space in the field." } },
       { title: { ko: "운영의 맥락", en: "Operational context" }, text: { ko: "측정과 관찰을 운영 환경의 맥락에서 바라봅니다.", en: "Consider measurements and observations in their operational context." } },
