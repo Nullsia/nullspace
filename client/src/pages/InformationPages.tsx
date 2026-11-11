@@ -240,14 +240,43 @@ function CompanyPage({ lang }: { lang: Language }) {
   </>;
 }
 
-/* 왼쪽부터 이영균, 전세영, 이승훈(가운데), 이영훈, 장시아 */
+/* 왼쪽부터 이영균, 이영훈, 이승훈(가운데), 전세영, 장시아 */
 const TEAM = [
-  { ko: "이영균", en: "Younggyun Lee", img: "lee-younggyun" },
-  { ko: "전세영", en: "Seyoung Jeon", img: "jeon-seyoung" },
-  { ko: "이승훈", en: "Seunghoon Lee", img: "lee-seunghoon", role: { ko: "설립자", en: "Founder" } },
-  { ko: "이영훈", en: "Younghoon Lee", img: "lee-younghoon" },
-  { ko: "장시아", en: "Sia Jang", img: "jang-sia" },
+  { ko: "이영균", en: "Younggyun Lee", img: "lee-younggyun", role: "Software Engineer" },
+  { ko: "이영훈", en: "Younghoon Lee", img: "lee-younghoon", role: "CTO" },
+  { ko: "이승훈", en: "Seunghoon Lee", img: "lee-seunghoon", role: "CEO" },
+  { ko: "전세영", en: "Seyoung Jeon", img: "jeon-seyoung", role: "AI Engineer" },
+  { ko: "장시아", en: "Sia Jang", img: "jang-sia", role: "Product Designer" },
 ];
+
+const PLAYBOOK = [
+  { title: { ko: "현장 조사", en: "Site survey" }, month: { ko: "1개월차", en: "Month 1" }, text: { ko: "센터 도면과 설비 목록을 받고 현장을 함께 봅니다. 측정 범위, 비교 기준, 성공 기준을 문서로 합의합니다.", en: "We review floor plans and equipment lists and walk the site together. Scope, baseline and success criteria are agreed in writing." }, out: { ko: "측정 계획서, 평가 기준", en: "Measurement plan, evaluation criteria" } },
+  { title: { ko: "진단 측정", en: "Diagnostic measurement" }, month: { ko: "2개월차", en: "Month 2" }, text: { ko: "로봇이 같은 경로를 반복 측정해 현재 상태를 기록합니다. 운영 중인 설정은 건드리지 않습니다.", en: "The robot measures the same route repeatedly to record the current state. Live settings stay untouched." }, out: { ko: "위치별 온도, 기류 지도와 우선 진단 대상", en: "Temperature by location, airflow map and priority targets" } },
+  { title: { ko: "원인 분석과 개선안", en: "Root cause and options" }, month: { ko: "3개월차", en: "Month 3" }, text: { ko: "측정값으로 트윈을 맞추고 열유동 해석으로 원인을 가립니다. 조치 후보를 해석으로 먼저 비교해 위험이 낮은 것부터 제안합니다.", en: "We calibrate the twin with measurements and find causes through thermal-flow analysis. Options are compared in simulation first, lowest risk first." }, out: { ko: "진단 근거, 조치 후보별 예상 효과", en: "Diagnostic evidence, expected effect per option" } },
+  { title: { ko: "적용과 전후 비교", en: "Apply and compare" }, month: { ko: "4개월차", en: "Month 4" }, text: { ko: "운영팀과 합의한 범위만 바꿉니다. 바꾼 뒤 같은 경로로 다시 재서 전후를 비교합니다.", en: "Only the scope agreed with the operations team changes. We re-measure the same route to compare before and after." }, out: { ko: "냉각 상태와 전력 변화 검증 결과", en: "Verified cooling state and power change" } },
+  { title: { ko: "검증 보고와 확산", en: "Report and scale" }, month: { ko: "5개월차", en: "Month 5" }, text: { ko: "결과와 유지 조건을 정리하고, 다른 구역과 센터로 넓힐 범위를 제안합니다.", en: "We document results and conditions to sustain them, and propose how to extend to other zones and sites." }, out: { ko: "검증 보고서, 운영 권고안", en: "Validation report, operating recommendations" } },
+];
+
+const PRINCIPLES = [
+  { title: { ko: "책임은 운영팀에 남기지 않습니다", en: "We share the responsibility" }, text: { ko: "변경 전에 해석으로 영향을 보여드리고, 변경 후 결과를 같이 확인합니다.", en: "We show the impact in simulation before any change, and check the result together after." } },
+  { title: { ko: "주장 대신 전후 수치", en: "Numbers, not claims" }, text: { ko: "모든 제안에는 측정 근거와 조치 후 재측정 결과가 붙습니다.", en: "Every proposal comes with measured evidence and a re-measurement after the change." } },
+  { title: { ko: "작게 시작합니다", en: "Start small" }, text: { ko: "한 구역에서 효과를 확인한 뒤 넓힙니다.", en: "We confirm the effect in one zone before scaling." } },
+];
+
+function Playbook({ lang }: { lang: Language }) {
+  return <section className="info-section info-playbook" id="playbook">
+    <SectionHeading title={lang === "ko" ? "이렇게 일합니다." : "How we work."} description={lang === "ko" ? "도입은 큰 계약부터 시작하지 않습니다. 작은 범위에서 재고, 고치고, 숫자로 확인한 뒤 넓힙니다. HD현대중공업 실증도 같은 순서로 진행합니다." : "Adoption doesn't start with a big contract. We measure, fix and confirm with numbers in a small scope, then expand. Our HD Hyundai Heavy Industries pilot follows the same order."} />
+    <ol className="info-steps">{PLAYBOOK.map((s, i) => <li key={s.title.en} className="info-step">
+      <span className="info-step-num">{String(i + 1).padStart(2, "0")}</span>
+      <div className="info-step-body">
+        <h3>{t(s.title, lang)}<span className="info-step-month">{t(s.month, lang)}</span></h3>
+        <p><Lines>{t(s.text, lang)}</Lines></p>
+        <p className="info-step-out"><strong>{lang === "ko" ? "결과물" : "Deliverables"}</strong>{t(s.out, lang)}</p>
+      </div>
+    </li>)}</ol>
+    <TopicCards items={PRINCIPLES} lang={lang} />
+  </section>;
+}
 
 /** 다섯 장의 카드가 가운데에 겹쳐 있다가, 화면에 들어오면 양옆으로 펼쳐진다 */
 function TeamFan({ lang }: { lang: Language }) {
@@ -263,7 +292,7 @@ function TeamFan({ lang }: { lang: Language }) {
   return <div ref={ref} className={`info-team-fan ${open ? "is-open" : ""}`}>
     {TEAM.map((m, i) => <figure key={m.img} className="info-team-card" style={{ "--d": 2 - i, zIndex: 10 - Math.abs(2 - i) } as React.CSSProperties}>
       <img src={`/images/team-${m.img}.webp`} alt={lang === "ko" ? m.ko : m.en} loading="lazy" />
-      <figcaption><strong>{lang === "ko" ? m.ko : m.en}</strong>{m.role && <span>{m.role[lang]}</span>}</figcaption>
+      <figcaption><strong>{lang === "ko" ? m.ko : m.en}</strong><span>{m.role}</span></figcaption>
     </figure>)}
   </div>;
 }
@@ -280,6 +309,7 @@ function TeamPage({ lang }: { lang: Language }) {
       <TeamFan lang={lang} />
       <p className="info-team-note"><Lines>{lang === "ko" ? "데이터센터의 복잡한 문제를 새로운 시선으로 바라봅니다. NULL SPACE는 다양한 분야의 사람들이 함께 질문하고, 실험하고, 만들어가는 팀입니다." : "Looking at complex data center challenges from a new perspective. NULL SPACE is a team where people from different fields question, experiment, and build together."}</Lines></p>
     </section>
+    <Playbook lang={lang} />
     <section className="info-section info-section-soft">
       <SectionHeading title={lang === "ko" ? "질문하고, 검증하며 나아갑니다." : "Question, validate, move forward."} description={lang === "ko" ? "큰 변화는 현장을 이해하는 일에서 시작됩니다." : "Meaningful change starts with understanding the field."} />
       <TopicCards items={working} lang={lang} />

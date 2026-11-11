@@ -181,3 +181,17 @@
   .info-page .info-team-card { flex: 0 0 62%; scroll-snap-align: center; transform: none !important; }
 }
 @media (prefers-reduced-motion: reduce) { .info-page .info-team-card { transition: none; } }
+
+/* Playbook timeline: numbered steps on a thin rail, lime markers. */
+.info-page .info-steps { list-style: none; margin: 0 0 64px; padding: 0; position: relative; max-width: 860px; }
+.info-page .info-steps::before { content: ""; position: absolute; left: 17px; top: 18px; bottom: 18px; width: 1px; background: var(--info-line); }
+.info-page .info-step { position: relative; display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 28px; padding: 0 0 48px; }
+.info-page .info-step:last-child { padding-bottom: 0; }
+.info-page .info-step-num { position: relative; z-index: 1; display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; background: var(--lime, #c6ff3d); color: #090909; font-size: 13px; font-weight: 700; letter-spacing: -.02em; }
+.info-page .info-step-body h3 { display: flex; align-items: baseline; gap: 14px; margin: 4px 0 0; font-size: clamp(20px, 1.6vw, 24px); font-weight: 500; letter-spacing: -.03em; }
+.info-page .info-step-month { color: #8a8a8a; font-size: 13px; font-weight: 400; letter-spacing: 0; }
+.info-page .info-step-body > p { margin-top: 12px; color: #d6d6d6; font-size: 16px; line-height: 1.8; }
+.info-page .info-step-body > p.info-step-out { margin-top: 10px; color: var(--info-muted); font-size: 14px; }
+.info-page .info-step-out strong { margin-right: 10px; color: var(--lime, #c6ff3d); font-weight: 600; }
+.info-page .info-playbook .info-topic-card { min-height: 0; }
+@media (max-width: 760px) { .info-page .info-step { gap: 18px; padding-bottom: 36px; } .info-page .info-step-body h3 { flex-wrap: wrap; gap: 4px 12px; } }
