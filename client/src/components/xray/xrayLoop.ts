@@ -8,7 +8,7 @@ import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPa
 import { FullScreenQuad } from "three/examples/jsm/postprocessing/Pass.js";
 import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
 
-export function createXrayLoop(host: HTMLElement, { reduced }: { reduced: boolean }) {
+export function createXrayLoop(host: HTMLElement, { getProgress, reduced }: { getProgress: () => number; reduced: boolean }) {
 
 
 // ───────── 설정 ─────────
@@ -498,7 +498,9 @@ function setTime(t) {               // t: 0..1 (한 루프)
   const ss = (x) => { x = Math.min(1, Math.max(0, x)); return x * x * x * (x * (6 * x - 15) + 10); };
   // e = 1: 라임 랙 앞(내부), e = 0: 외관. 0~0.05 머묾 → 0.05~0.64 빠져나옴 → 0.64~0.70 머묾 → 0.70~1 다시 들어감
   const e0 = t < 0.05 ? 1 : t < 0.64 ? 1 - so((t - 0.05) / 0.59) : t < 0.70 ? 0 : ss((t - 0.70) / 0.30);
-  const e = e0;
+  // Scrolling the hero pushes the camera back in through the peel toward the lime rack, whatever the loop is doing.
+  const s = Math.max(0, Math.min(1, getProgress()));
+  const e = e0 + (0.92 - e0) * s;
   cam.position.copy(path.getPoint(e));
   tmpL.copy(LOOK_A).lerp(LOOK_B, sm(0.0, 0.9, e));
   cam.fov = 54 - 18 * sm(0.0, 1.0, e); cam.updateProjectionMatrix();
@@ -620,37 +622,14 @@ fit();
 const ro = new ResizeObserver(() => { fit(); if (!running) { setTime(0); draw(); } });
 ro.observe(host);
 let running = false, raf = 0, visible = true;
-// The loop plays on its own. playOut() runs it forward at its own pace to the end of the exterior shot (t = 0.70)
-// and holds there; the hero blocks page scroll until that resolves, so the whole move outside is always seen.
-// resetLoop() restarts the loop from the first scene.
-const OUT_END = 0.70;
-let t0 = performance.now(), last = t0, shown = 0, mode: "loop" | "out" | "hold" = "loop", outDone: (() => void) | null = null;
-const frame = () => {
-  raf = 0; if (!running) return;
-  const now = performance.now(), dt = Math.min(0.25, (now - last) / 1000); last = now;
-  if (mode === "loop") shown = ((now - t0) / 1000 / LOOP) % 1;
-  else if (mode === "out") {
-    // Finish any push-in quickly, then play the pull-out a little faster than the ambient loop.
-    const speed = shown > OUT_END ? 3.2 : 1.45;
-    const next = shown + (dt / LOOP) * speed;
-    if (shown <= OUT_END && next >= OUT_END) { shown = OUT_END; mode = "hold"; outDone?.(); outDone = null; }
-    else shown = next % 1;
-  }
-  setTime(shown); draw(); raf = requestAnimationFrame(frame);
-};
-const start = () => { if (reduced || running || !visible) return; running = true; last = performance.now(); raf = requestAnimationFrame(frame); };
+const t0 = performance.now();
+const frame = () => { raf = 0; if (!running) return; setTime(((performance.now() - t0) / 1000 / LOOP) % 1); draw(); raf = requestAnimationFrame(frame); };
+const start = () => { if (reduced || running || !visible) return; running = true; raf = requestAnimationFrame(frame); };
 const stop = () => { running = false; if (raf) cancelAnimationFrame(raf); raf = 0; };
 const io = new IntersectionObserver(([e]) => { visible = e.isIntersecting; visible ? start() : stop(); });
 io.observe(host);
 if (reduced) { setTime(0); draw(); } else start();
 return {
-  playOut() {
-    if (mode === "hold") return Promise.resolve();
-    mode = "out";
-    if (!running) { running = true; last = performance.now(); raf = requestAnimationFrame(frame); }
-    return new Promise<void>((res) => { outDone = res; });
-  },
-  resetLoop() { mode = "loop"; t0 = performance.now(); outDone?.(); outDone = null; },
   redraw() { if (!running) { setTime(0); draw(); } },
   dispose() {
     stop(); ro.disconnect(); io.disconnect();
