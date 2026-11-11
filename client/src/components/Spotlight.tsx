@@ -5,7 +5,7 @@ import "./Spotlight.css";
  * Cursor spotlight that shows an inverted copy of its content inside a shape that follows the pointer.
  * The copy is aria-hidden and inert; the shape tracks the pointer directly (no easing) and only its size animates.
  *   shape "circle"   round spot
- *   shape "triangle" the slanted triangle from the NULL SPACE logo mark
+ *   shape "triangle" the slanted logo mark, full section height; it only follows the pointer sideways
  * Touch and coarse pointers get no spotlight.
  */
 export default function Spotlight({ as: Tag = "div", shape, className = "", invClassName = "", inverse, id, children }: {
@@ -27,6 +27,7 @@ export default function Spotlight({ as: Tag = "div", shape, className = "", invC
       const r = el.getBoundingClientRect();
       el.style.setProperty("--mx", `${x - r.left}px`);
       el.style.setProperty("--my", `${y - r.top}px`);
+      el.style.setProperty("--sh", `${r.height}px`);
     };
     const move = (e: PointerEvent) => { x = e.clientX; y = e.clientY; place(); };
     const enter = (e: PointerEvent) => { inside = true; move(e); el.classList.add("is-on"); };

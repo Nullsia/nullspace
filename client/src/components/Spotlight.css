@@ -2,13 +2,14 @@
 .spot { position: relative; --mx: -9999px; --my: -9999px; --spot-r: 0px; --spot-size: 150px; transition: --spot-r .28s ease; }
 .spot-inv { position: absolute; inset: 0; padding: inherit; pointer-events: none; overflow: hidden; z-index: 2; }
 .spot-circle > .spot-inv { clip-path: circle(var(--spot-r) at var(--mx) var(--my)); }
-/* Logo mark: straight left edge, short top edge, slanted right edge down to a wide bottom (490 x 538, top 145). */
+/* Logo mark (490 x 538, top edge 145): runs from the section's top to its bottom and only moves sideways. */
+.spot-triangle { --sh: 600px; --spot-size: calc(var(--sh) / 2); }
 .spot-triangle > .spot-inv {
   clip-path: polygon(
-    calc(var(--mx) - var(--spot-r) * .91) calc(var(--my) - var(--spot-r)),
-    calc(var(--mx) - var(--spot-r) * .371) calc(var(--my) - var(--spot-r)),
-    calc(var(--mx) + var(--spot-r) * .91) calc(var(--my) + var(--spot-r)),
-    calc(var(--mx) - var(--spot-r) * .91) calc(var(--my) + var(--spot-r))
+    calc(var(--mx) - var(--spot-r) * .91) 0,
+    calc(var(--mx) - var(--spot-r) * .371) 0,
+    calc(var(--mx) + var(--spot-r) * .91) 100%,
+    calc(var(--mx) - var(--spot-r) * .91) 100%
   );
 }
 .spot.is-on { --spot-r: var(--spot-size); }

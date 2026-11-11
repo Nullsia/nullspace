@@ -108,7 +108,7 @@ p { text-wrap: balance; }
 }
 
 /* Intro: dark grey, with the logo-triangle spotlight inverting to lime. */
-.home-page .intro-section { background: #1f1f1f; color: #f2f2f2; --spot-size: 170px; }
+.home-page .intro-section { background: #1f1f1f; color: #f2f2f2; }
 .home-page .intro-section .intro-layout h2 em { color: #8a8a8a; }
 .home-page .intro-section .intro-copy p { color: #a9a9a9; }
 .home-page .intro-section .underlined-link { border-color: #d8d8d8; color: #f2f2f2; }
