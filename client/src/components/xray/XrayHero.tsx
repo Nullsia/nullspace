@@ -17,7 +17,7 @@ export default function XrayHero({ onFail }: { onFail?: () => void }) {
       const hero = stage.querySelector<HTMLElement>(":scope > .hero");
       const travel = Math.max(1, stage.offsetHeight - (hero?.offsetHeight ?? window.innerHeight));
       const p = Math.max(0, Math.min(1, -stage.getBoundingClientRect().top / travel));
-      progress = p * p * (3 - 2 * p);
+      progress = p;
     };
     readProgress();
     window.addEventListener("scroll", readProgress, { passive: true });

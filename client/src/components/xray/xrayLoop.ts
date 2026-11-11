@@ -498,9 +498,7 @@ function setTime(t) {               // t: 0..1 (한 루프)
   const ss = (x) => { x = Math.min(1, Math.max(0, x)); return x * x * x * (x * (6 * x - 15) + 10); };
   // e = 1: 라임 랙 앞(내부), e = 0: 외관. 0~0.05 머묾 → 0.05~0.64 빠져나옴 → 0.64~0.70 머묾 → 0.70~1 다시 들어감
   const e0 = t < 0.05 ? 1 : t < 0.64 ? 1 - so((t - 0.05) / 0.59) : t < 0.70 ? 0 : ss((t - 0.70) / 0.30);
-  // Scrolling the hero pushes the camera back in through the peel toward the lime rack, whatever the loop is doing.
-  const s = Math.max(0, Math.min(1, getProgress()));
-  const e = e0 + (0.92 - e0) * s;
+  const e = e0;
   cam.position.copy(path.getPoint(e));
   tmpL.copy(LOOK_A).lerp(LOOK_B, sm(0.0, 0.9, e));
   cam.fov = 54 - 18 * sm(0.0, 1.0, e); cam.updateProjectionMatrix();
@@ -622,9 +620,25 @@ fit();
 const ro = new ResizeObserver(() => { fit(); if (!running) { setTime(0); draw(); } });
 ro.observe(host);
 let running = false, raf = 0, visible = true;
-const t0 = performance.now();
-const frame = () => { raf = 0; if (!running) return; setTime(((performance.now() - t0) / 1000 / LOOP) % 1); draw(); raf = requestAnimationFrame(frame); };
-const start = () => { if (reduced || running || !visible) return; running = true; raf = requestAnimationFrame(frame); };
+// At the top of the page the loop plays on its own. Scrolling the hero scrubs the pull-out instead:
+// progress 0..1 runs the loop from the first scene to the end of the exterior shot (t = 0.70),
+// so the whole move outside is seen before the page moves on. Back at the top the loop restarts from the first scene.
+const SCRUB_END = 0.70;
+let t0 = performance.now(), last = t0, shown = 0, scrubbing = false;
+const frame = () => {
+  raf = 0; if (!running) return;
+  const now = performance.now(), dt = Math.min(0.1, (now - last) / 1000); last = now;
+  const s = Math.max(0, Math.min(1, getProgress()));
+  if (s > 0.002) {
+    if (!scrubbing) { scrubbing = true; if (shown > SCRUB_END) shown = 0; }
+    shown += (s * SCRUB_END - shown) * Math.min(1, dt * 7);
+  } else {
+    if (scrubbing) { scrubbing = false; t0 = now - shown * LOOP * 1000; if (shown < 0.01) t0 = now; }
+    shown = ((now - t0) / 1000 / LOOP) % 1;
+  }
+  setTime(shown); draw(); raf = requestAnimationFrame(frame);
+};
+const start = () => { if (reduced || running || !visible) return; running = true; last = performance.now(); raf = requestAnimationFrame(frame); };
 const stop = () => { running = false; if (raf) cancelAnimationFrame(raf); raf = 0; };
 const io = new IntersectionObserver(([e]) => { visible = e.isIntersecting; visible ? start() : stop(); });
 io.observe(host);

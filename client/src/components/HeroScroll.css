@@ -84,3 +84,9 @@
 }
 @media (prefers-reduced-motion: reduce) { .hero-xray { transition: none; } }
 .hero-art.has-xray ~ .hero-copy :is(h1, p) { text-shadow: 0 2px 24px rgba(0,0,0,.65); }
+
+/* With the X-ray loop the scroll scrubs the pull-out, so the stage gets more travel and the art stops zooming. */
+@media (prefers-reduced-motion: no-preference) {
+  .hero-scroll-stage:has(.hero-art.has-xray) { height: calc(100svh + min(160svh, 1400px)); }
+  .hero-scroll-stage .hero-art.has-xray { transform: none; }
+}
