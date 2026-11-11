@@ -48,10 +48,8 @@
 .home-page .stat-row strong small { margin-left: .22em; }
 
 /* Products: show the whole object inside the card. */
-.home-page .product-image.prover { background: #b9b9bb; }
-.home-page .product-image.doras { background: #9e9da0; }
-.home-page .product-image.prover img, .home-page .product-image.doras img { object-fit: contain; object-position: center; }
-.home-page .product-image.prover img { padding: 18px 0 0; }
+.home-page .product-image.prover, .home-page .product-image.doras { background: #c4c4c4; }
+.home-page .product-image.prover img, .home-page .product-image.doras img { object-fit: cover; object-position: center; }
 
 /* Contact band: one-line headline, large CTA on the right. */
 .home-page .contact-band-content { display: flex; align-items: flex-end; justify-content: space-between; gap: 48px; }
