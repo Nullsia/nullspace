@@ -77,7 +77,7 @@ export default function ScenarioLab({ lang }: { lang: "ko" | "en" }) {
     </div>
     <div className="lab-shell">
       <div className="lab-content">
-        <ScenarioVisual scenario={scenario} fallback={SPACE} hint={en ? "Drag to rotate" : "끌어서 돌려 보기"} />
+        <ScenarioVisual motion scenario={scenario} fallback={SPACE} hint={en ? "Drag to rotate" : "끌어서 돌려 보기"} />
         <div className="lab-panel">
           <div aria-live="polite"><span className="lab-panel-label">{en ? selected.en : selected.ko}</span><h3>{en ? selected.qEn : selected.qKo}</h3><p><Lines>{en ? selected.dEn : selected.dKo}</Lines></p></div>
           <div className="scenario-tabs" role="group" aria-label={en ? "Select scenario" : "시나리오 선택"}>

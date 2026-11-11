@@ -309,12 +309,14 @@ export function RackCabinets({ data, paint }: { data: TwinData; paint: React.Ref
  * 항온항습기(바닥형). 받침 위에 밝은 외함, 긴 면(앞, 뒤)에 루버와 계기 창, 나머지는 민판.
  * failed 인 장비는 외함을 붉게 칠하고 빛나게 한다(시뮬레이터의 고장 시나리오).
  */
-export function CrahUnits({ data }: { data: TwinData }) {
+export function CrahUnits({ data, failedLime = false }: { data: TwinData; failedLime?: boolean }) {
   const { units, room } = data.scene;
   const mats = useMemo(() => {
     const make = (failed: boolean) => {
-      const tint = failed ? "#4a4a4a" : "#ffffff";
-      const glow = {};
+      // failedLime: 솔루션 페이지에서는 멈춘 장비를 라임으로 칠하고 은은하게 빛나게 한다
+      const lime = failed && failedLime;
+      const tint = lime ? "#c6ff3d" : failed ? "#4a4a4a" : "#ffffff";
+      const glow = lime ? { emissive: new THREE.Color("#c6ff3d"), emissiveIntensity: 0.35 } : {};
       const louvre = new THREE.MeshStandardMaterial({
         map: louvreTexture(),
         color: tint,
@@ -323,12 +325,12 @@ export function CrahUnits({ data }: { data: TwinData }) {
         ...glow,
       });
       const plain = new THREE.MeshStandardMaterial({
-        color: failed ? "#2c2c2c" : "#d3d9e0",
+        color: lime ? "#c6ff3d" : failed ? "#2c2c2c" : "#d3d9e0",
         roughness: 0.55,
         metalness: 0.1,
         ...glow,
       });
-      const top = new THREE.MeshStandardMaterial({ color: failed ? "#333333" : "#aab3bd", roughness: 0.6, ...glow });
+      const top = new THREE.MeshStandardMaterial({ color: lime ? "#dcff8a" : failed ? "#333333" : "#aab3bd", roughness: 0.6, ...glow });
       // 상자 면 순서 +x, -x, +y, -y, +z, -z
       return {
         x: [louvre, louvre, top, plain, plain, plain],
@@ -341,7 +343,7 @@ export function CrahUnits({ data }: { data: TwinData }) {
       failed: make(true),
       plinth: new THREE.MeshStandardMaterial({ color: "#1f252d", roughness: 0.8 }),
     };
-  }, []);
+  }, [failedLime]);
   useEffect(
     () => () => {
       for (const m of [...mats.ok.all, ...mats.failed.all, mats.plinth]) m.dispose();

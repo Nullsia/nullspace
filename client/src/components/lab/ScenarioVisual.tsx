@@ -7,7 +7,7 @@ const LabScene = lazy(() => import("./lab-scene").catch(() => ({ default: (() =>
 export const SCENARIO_KEYS: ScenarioKey[] = ["S0_baseline", "S2_ai_racks", "S3_containment", "S4_cont_22C", "S5_cont_fail"];
 
 /** 3D data center twin for the scenario section. Falls back to the still image without WebGL. */
-export default function ScenarioVisual({ scenario, fallback, hint }: { scenario: number; fallback: string; hint: string }) {
+export default function ScenarioVisual({ scenario, fallback, hint, motion = false }: { scenario: number; fallback: string; hint: string; motion?: boolean }) {
   const ref = useRef<HTMLDivElement>(null);
   const { near, active } = useNearActive(ref);
   const [webgl, setWebgl] = useState(false);
@@ -21,7 +21,7 @@ export default function ScenarioVisual({ scenario, fallback, hint }: { scenario:
   }, []);
   return <div ref={ref} className="lab-visual lab-visual-3d" style={{ backgroundImage: ready ? "none" : `linear-gradient(0deg, rgba(0,0,0,.35), transparent 55%), url('${fallback}')` }}>
     <div className={`lab-3d-layer ${ready ? "is-ready" : ""}`}>
-      {webgl && near && <Suspense fallback={null}><LabScene scenario={SCENARIO_KEYS[scenario] ?? "S0_baseline"} active={active} interactive={interactive} reduced={reduced} onReady={() => setReady(true)} /></Suspense>}
+      {webgl && near && <Suspense fallback={null}><LabScene scenario={SCENARIO_KEYS[scenario] ?? "S0_baseline"} active={active} interactive={interactive} reduced={reduced} motion={motion} onReady={() => setReady(true)} /></Suspense>}
     </div>
     {ready && interactive && <span className="lab-3d-hint">{hint}</span>}
   </div>;

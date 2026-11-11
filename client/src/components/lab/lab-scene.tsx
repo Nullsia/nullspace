@@ -22,24 +22,92 @@ import { Flow, Slice, makeClip } from "../story/story-scene";
 
 const BG = "#0b0b0b";
 
+const LIME_SRGB: [number, number, number] = [0xc6 / 255, 1, 0x3d / 255];
+const BLACK_SRGB: [number, number, number] = [0.05, 0.05, 0.05];
+
+/** 칸마다 고정된 0~1 난수. 같은 칸은 언제나 같은 값이다 */
+function hash01(i: number) {
+  const x = Math.sin(i * 127.1 + 311.7) * 43758.5453;
+  return x - Math.floor(x);
+}
+
+/** sRGB 색 a 와 b 를 f 비율로 섞어 선형 RGB 로 넣는다 */
+function fillMix(out: Float32Array, pick: (band: number) => [number, number, number, number]) {
+  const color = new THREE.Color();
+  for (let b = 0; b < out.length / 3; b++) {
+    const [r, g, bl, k] = pick(b);
+    color.setRGB(r * k, g * k, bl * k, THREE.SRGBColorSpace);
+    out[b * 3] = color.r;
+    out[b * 3 + 1] = color.g;
+    out[b * 3 + 2] = color.b;
+  }
+}
+
+const mix = (a: [number, number, number], b: [number, number, number], f: number, k = 1): [number, number, number, number] =>
+  [a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f, a[2] + (b[2] - a[2]) * f, k];
+
+/**
+ * 솔루션 페이지의 연출(motion). 실제 흡기 온도 대신 변화를 보여주는 색 흐름을 쓴다.
+ *  - S3 냉기 통로를 막으면: 진하고 연한 라임이 고르게 퍼져 있다가 천천히 식어 검정이 된다
+ *  - S4 설정 온도를 올리면: 연한 라임과 검정이 섞여 있다가 천천히 데워져 라임으로 켜진다
+ * 둘 다 아니면 null 이고 평소처럼 실제 온도 색을 쓴다.
+ */
+function motionPaint(data: TwinData): { from: Float32Array; to: Float32Array; secs: number } | null {
+  const n = data.scene.racks.length * 3 * 3;
+  const key = data.scene.key;
+  if (key !== "S3_containment" && key !== "S4_cont_22C") return null;
+  const from = new Float32Array(n);
+  const to = new Float32Array(n);
+  if (key === "S3_containment") {
+    fillMix(from, (b) => [...LIME_SRGB, 0.4 + 0.6 * hash01(b)] as [number, number, number, number]);
+    fillMix(to, (b) => [...BLACK_SRGB, 0.8 + 0.4 * hash01(b + 999)] as [number, number, number, number]);
+  } else {
+    fillMix(from, (b) => {
+      const h = hash01(b);
+      // 절반쯤은 검정, 나머지는 연한 라임(검정과 섞은 라임)
+      return h < 0.5 ? [...BLACK_SRGB, 1] as [number, number, number, number] : mix(BLACK_SRGB, LIME_SRGB, 0.25 + 0.3 * hash01(b + 77));
+    });
+    fillMix(to, (b) => [...LIME_SRGB, 0.82 + 0.18 * hash01(b + 555)] as [number, number, number, number]);
+  }
+  return { from, to, secs: 4.2 };
+}
+
+const ease = (x: number) => (x < 0.5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2);
+
 /** 랙은 언제나 꽉 찬 캐비닛이다. 시나리오를 바꾸면 칸 색만 이전 색에서 새 색으로 0.6초 동안 넘어간다 */
-function Racks({ data }: { data: TwinData }) {
-  const target = useMemo(() => rackColors(data), [data]);
+function Racks({ data, motion }: { data: TwinData; motion: boolean }) {
+  const scripted = useMemo(() => (motion ? motionPaint(data) : null), [data, motion]);
+  const target = useMemo(() => scripted?.to ?? rackColors(data), [data, scripted]);
   // 시나리오가 바뀌어도 같은 버퍼를 써야 이전 색에서 넘어간다. 처음 한 번만 만든다
   const [paint] = useState<React.RefObject<RackPaint>>(() => ({ current: makePaint(data, 1) }));
   const t = useRef(1);
 
   useEffect(() => {
     t.current = 0;
-  }, [data]);
+    // 연출이 있는 시나리오는 시작 색으로 바로 바꾸고 거기서 천천히 넘어간다
+    if (scripted) {
+      paint.current.colors.set(scripted.from);
+      paint.current.colorDirty = true;
+    }
+  }, [data, scripted, paint]);
 
   useFrame((_, delta) => {
     const pt = paint.current;
     if (t.current >= 1) return;
+    const arr = pt.colors;
+    if (scripted) {
+      // 앞 0.6초는 시작 색을 보여주고, 그 뒤 secs 동안 목표 색으로 넘어간다
+      const hold = 0.6 / (scripted.secs + 0.6);
+      t.current = Math.min(1, t.current + delta / (scripted.secs + 0.6));
+      const f = ease(Math.max(0, (t.current - hold) / (1 - hold)));
+      const { from, to } = scripted;
+      for (let i = 0; i < arr.length; i++) arr[i] = from[i] + (to[i] - from[i]) * f;
+      pt.colorDirty = true;
+      return;
+    }
     t.current = Math.min(1, t.current + delta / 0.6);
     // 지금 색에서 목표 색으로 조금씩 다가간다. 마지막 프레임에 정확히 맞춘다
     const k = t.current >= 1 ? 1 : Math.min(1, delta * 6);
-    const arr = pt.colors;
     for (let i = 0; i < arr.length; i++) arr[i] += (target[i] - arr[i]) * k;
     pt.colorDirty = true;
   });
@@ -82,7 +150,7 @@ function Highlights({ data }: { data: TwinData }) {
   );
 }
 
-function Room({ data }: { data: TwinData }) {
+function Room({ data, motion }: { data: TwinData; motion: boolean }) {
   const { room, tiles, containment } = data.scene;
   const [cx, , cz] = toThree(room.x / 2, room.y / 2, 0);
   const outline = useMemo(
@@ -109,7 +177,7 @@ function Room({ data }: { data: TwinData }) {
       <lineSegments geometry={outline} position={[cx, (room.floor + room.ceil) / 2, cz]}>
         <lineBasicMaterial color="#4a4a4a" />
       </lineSegments>
-      <CrahUnits data={data} />
+      <CrahUnits data={data} failedLime={motion} />
       {containment.map(([a, b], i) => {
         const [x, y, z] = toThree((a[0] + b[0]) / 2, (a[1] + b[1]) / 2, (a[2] + b[2]) / 2);
         return (
@@ -191,7 +259,7 @@ function Controls({ view, interactive, reduced }: { view: LabView; interactive: 
   return null;
 }
 
-function Scene({ data, interactive, reduced }: { data: TwinData; interactive: boolean; reduced: boolean }) {
+function Scene({ data, interactive, reduced, motion }: { data: TwinData; interactive: boolean; reduced: boolean; motion: boolean }) {
   const clip = useMemo(() => {
     const c = makeClip();
     // 띠 없이 전부 온도 색으로 보인다
@@ -207,8 +275,8 @@ function Scene({ data, interactive, reduced }: { data: TwinData; interactive: bo
       <ambientLight intensity={0.6} />
       <directionalLight position={[10, 20, 8]} intensity={1.3} />
       <directionalLight position={[-12, 10, -6]} intensity={0.35} />
-      <Room data={data} />
-      <Racks data={data} />
+      <Room data={data} motion={motion} />
+      <Racks data={data} motion={motion} />
       <Highlights data={data} />
       <Flow key={data.scene.key} data={data} clip={clip} />
       <Slice key={`s-${data.scene.key}`} data={data} clip={clip} />
@@ -223,12 +291,15 @@ export default function LabScene({
   interactive,
   reduced,
   onReady,
+  motion = false,
 }: {
   scenario: ScenarioKey;
   active: boolean;
   interactive: boolean;
   reduced: boolean;
   onReady?: () => void;
+  /** 솔루션 페이지 연출: S3/S4 색 흐름, S5 멈춘 항온항습기 라임 */
+  motion?: boolean;
 }) {
   // 새 시나리오를 받는 동안에는 이전 장면을 그대로 둔다 (빈 화면 깜빡임 방지)
   const [data, setData] = useState<TwinData | null>(null);
@@ -257,7 +328,7 @@ export default function LabScene({
       }}
       style={{ touchAction: interactive ? "none" : "pan-y" }}
     >
-      <Scene data={data} interactive={interactive} reduced={reduced} />
+      <Scene data={data} interactive={interactive} reduced={reduced} motion={motion} />
     </Canvas>
   );
 }
