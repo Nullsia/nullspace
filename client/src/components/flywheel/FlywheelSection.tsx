@@ -4,8 +4,9 @@ import { LAPS, flyTimeOf, type FlyStage } from "@/lib/flywheel";
 import { hasWebGL, useNearActive } from "@/lib/webgl";
 import type { FlyControl, FlyLabels, FlyStatus } from "./flywheel-scene";
 import "./FlywheelSection.css";
+import { Lines } from "../Lines";
 
-const FlywheelScene = lazy(() => import("./flywheel-scene"));
+const FlywheelScene = lazy(() => import("./flywheel-scene").catch(() => ({ default: (() => null) as never })));
 
 const COPY = {
   ko: {
@@ -52,7 +53,7 @@ function SpotCard({ title, body }: { title: string; body: string }) {
     el.style.setProperty("--mx", `${e.clientX - r.left}px`);
     el.style.setProperty("--my", `${e.clientY - r.top}px`);
   };
-  const content = <><h3>{title}</h3><p>{body}</p></>;
+  const content = <><h3>{title}</h3><p><Lines>{body}</Lines></p></>;
   return <div className="fw-spot" ref={ref} onPointerMove={move} onPointerEnter={move}>
     {content}
     <div className="fw-spot-inv" aria-hidden="true">{content}</div>
@@ -82,7 +83,7 @@ export default function FlywheelSection({ english }: { english: boolean }) {
   const toggle = () => { const next = !playing; ctl.current.playing = next; setPlaying(next); };
   const show3d = webgl !== false;
   const stage = t.stages[status.stage];
-  const caption = (className: string) => <div className={className}>{status.hold ? <strong>{t.hud.restart}</strong> : <><strong><em>{stage.label}</em> {stage.title}</strong><p>{stage.body}</p></>}</div>;
+  const caption = (className: string) => <div className={className}>{status.hold ? <strong>{t.hud.restart}</strong> : <><strong><em>{stage.label}</em> {stage.title}</strong><p><Lines>{stage.body}</Lines></p></>}</div>;
 
   return <div className="fw reveal">
     {show3d && <div className="fw-stage" ref={ref}>
@@ -107,11 +108,11 @@ export default function FlywheelSection({ english }: { english: boolean }) {
       {t.stages.map((s, k) => {
         const on = show3d && !status.hold && status.stage === k;
         return <li key={s.label} className="flow-item"><button type="button" onClick={() => jump(k as FlyStage)} disabled={!show3d} aria-current={on ? "step" : undefined} className={on ? "active" : ""}>
-          <h3>{s.label}</h3><p>{s.title}</p>
+          <h3>{s.label}</h3><p><Lines>{s.title}</Lines></p>
         </button></li>;
       })}
     </ol>
     <div className="fw-results">{t.results.map(r => <SpotCard key={r.title} title={r.title} body={r.body} />)}</div>
-    <p className="fw-note">{t.note}</p>
+    <p className="fw-note"><Lines>{t.note}</Lines></p>
   </div>;
 }

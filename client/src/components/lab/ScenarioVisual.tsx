@@ -2,7 +2,7 @@ import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import type { ScenarioKey } from "@/lib/twin";
 import { hasWebGL, useNearActive } from "@/lib/webgl";
 
-const LabScene = lazy(() => import("./lab-scene"));
+const LabScene = lazy(() => import("./lab-scene").catch(() => ({ default: (() => null) as never })));
 
 export const SCENARIO_KEYS: ScenarioKey[] = ["S0_baseline", "S2_ai_racks", "S3_containment", "S4_cont_22C", "S5_cont_fail"];
 

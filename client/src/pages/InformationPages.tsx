@@ -1,6 +1,7 @@
-import { useEffect, type ReactNode } from "react";
+import type { ReactNode } from "react";
 import ScenarioLab from "../components/ScenarioLab";
 import "./InformationPages.css";
+import { Lines } from "../components/Lines";
 
 type Language = "ko" | "en";
 type Page = "definition" | "products" | "n-mover" | "n-prover" | "n-doras" | "company" | "team" | "partners";
@@ -119,7 +120,7 @@ function Hero({ title, muted, description, variant = "space" }: {
   return <section className="info-hero">
     <div className="info-hero-copy">
       <h1>{title}{muted && <><br /><span>{muted}</span></>}</h1>
-      <p className="info-hero-description">{description}</p>
+      <p className="info-hero-description"><Lines>{description}</Lines></p>
     </div>
     <Wireframe variant={variant} />
   </section>;
@@ -128,19 +129,19 @@ function Hero({ title, muted, description, variant = "space" }: {
 function SectionHeading({ title, description }: { title: string; description?: string }) {
   return <div className="info-section-heading">
     <div><h2>{title}</h2></div>
-    {description && <p>{description}</p>}
+    {description && <p><Lines>{description}</Lines></p>}
   </div>;
 }
 
 function TopicCards({ items, lang }: { items: { title: Localized; text: Localized }[]; lang: Language }) {
   return <div className="info-topic-grid">{items.map((item) => <article className="info-topic-card" key={t(item.title, lang)}>
-    <h3>{t(item.title, lang)}</h3><p>{t(item.text, lang)}</p>
+    <h3>{t(item.title, lang)}</h3><p><Lines>{t(item.text, lang)}</Lines></p>
   </article>)}</div>;
 }
 
 function NextPanel({ title, description, href, linkText }: { title: string; description?: string; href: string; linkText: string }) {
   return <section className="info-next">
-    <div><h2>{title}</h2>{description && <p>{description}</p>}</div>
+    <div><h2>{title}</h2>{description && <p><Lines>{description}</Lines></p>}</div>
     <a className="info-button" href={href}><span>{linkText}</span><Arrow diagonal /></a>
   </section>;
 }
@@ -151,7 +152,7 @@ const definitionTopics = [
   { title: { ko: "정보", en: "Information" }, text: { ko: "구축과 운영의 정보를 연결해 판단의 바탕을 만듭니다.", en: "Connecting information from installation and operations provides context for decisions." } },
 ];
 
-function DefinitionPage({ lang, last = true }: { lang: Language; last?: boolean }) {
+function DefinitionPage({ lang }: { lang: Language }) {
   return <>
     <Hero title={lang === "ko" ? "보이지 않는 공간을" : "See the space"} muted={lang === "ko" ? "새롭게 바라봅니다." : "beyond the visible."} description={lang === "ko" ? "데이터센터의 공간과 운영을 연결해, 더 나은 판단을 위한 시야를 만듭니다." : "Connecting data center space and operations to create a clearer view for better decisions."} />
     <section className="info-section">
@@ -160,10 +161,10 @@ function DefinitionPage({ lang, last = true }: { lang: Language; last?: boolean 
     </section>
     <section className="info-section info-split-section">
       <div><h2>{lang === "ko" ? "측정에서 이해로, 이해에서 다음 선택으로." : "From measurement to understanding, and on to the next decision."}</h2></div>
-      <div className="info-prose"><p>{lang === "ko" ? "현장을 관찰하고 공간과 정보를 연결합니다. 다양한 배치와 냉각 시나리오를 가상의 공간에서 살펴보며, 현장의 조건에 맞는 다음 단계를 탐색합니다." : "We observe the field and connect space with information. By exploring layout and cooling scenarios in a virtual space, we look for next steps suited to conditions on site."}</p><p>{lang === "ko" ? "시나리오는 이해를 돕기 위한 예시이며 계산 결과가 아니고 아직 현장 실측으로 검증되지 않았습니다. 실제 적용에는 현장 조건에 기반한 추가 검토와 검증이 필요합니다." : "The scenarios are illustrative, not calculated results, and have not yet been validated against field measurements. Real-world application requires further review and validation against site conditions."}</p><TextLink href={`${pathFor("/solution", lang)}#products`}>{lang === "ko" ? "제품 살펴보기" : "Explore the products"}</TextLink></div>
+      <div className="info-prose"><p><Lines>{lang === "ko" ? "현장을 관찰하고 공간과 정보를 연결합니다. 다양한 배치와 냉각 시나리오를 가상의 공간에서 살펴보며, 현장의 조건에 맞는 다음 단계를 탐색합니다." : "We observe the field and connect space with information. By exploring layout and cooling scenarios in a virtual space, we look for next steps suited to conditions on site."}</Lines></p><p><Lines>{lang === "ko" ? "시나리오는 이해를 돕기 위한 예시이며 계산 결과가 아니고 아직 현장 실측으로 검증되지 않았습니다. 실제 적용에는 현장 조건에 기반한 추가 검토와 검증이 필요합니다." : "The scenarios are illustrative, not calculated results, and have not yet been validated against field measurements. Real-world application requires further review and validation against site conditions."}</Lines></p><TextLink href={pathFor("/solution/product", lang)}>{lang === "ko" ? "제품 살펴보기" : "Explore the products"}</TextLink></div>
     </section>
     <ScenarioLab lang={lang} />
-    {last && <NextPanel title={lang === "ko" ? "공간의 가능성을 함께 살펴봅니다." : "Let's explore the possibilities in your space."} href={pathFor("/contact", lang)} linkText={t(labels.contact, lang)} />}
+    <NextPanel title={lang === "ko" ? "공간의 가능성을 함께 살펴봅니다." : "Let's explore the possibilities in your space."} href={pathFor("/contact", lang)} linkText={t(labels.contact, lang)} />
   </>;
 }
 
@@ -174,7 +175,7 @@ function ProductArt({ id, lang }: { id: ProductPage; lang: Language }) {
   </div>;
 }
 
-function ProductsPage({ lang, last = true }: { lang: Language; last?: boolean }) {
+function ProductsPage({ lang }: { lang: Language }) {
   const ids: ProductPage[] = ["n-mover", "n-prover", "n-doras"];
   return <>
     <Hero title={lang === "ko" ? "구축에서 운영까지," : "From installation"} muted={lang === "ko" ? "하나의 흐름으로." : "to operations."} description={lang === "ko" ? "물리적 작업과 공간의 정보를 연결해 데이터센터를 바라봅니다." : "A connected view of the data center, from physical work to information about the space."} variant="orbit" />
@@ -182,32 +183,32 @@ function ProductsPage({ lang, last = true }: { lang: Language; last?: boolean })
       <SectionHeading title={lang === "ko" ? "각 단계의 과제를 연결합니다." : "Connecting the challenges at each stage."} description={lang === "ko" ? "각 제품이 바라보는 영역을 살펴보세요." : "Explore the focus of each product."} />
       <div className="info-product-grid">{ids.map((id) => {
         const product = products[id];
-        return <a className="info-product-card" href={`${pathFor("/solution", lang)}#${id}`} key={id}>
+        return <a className="info-product-card" href={pathFor(`/solution/product/${id}`, lang)} key={id}>
           <ProductArt id={id} lang={lang} />
-          <div className="info-product-card-copy"><div className="info-product-meta"><Arrow diagonal /></div><h3>{product.name}</h3><p>{t(product.description, lang)}</p><span className="info-card-link">{t(labels.explore, lang)} <Arrow /></span></div>
+          <div className="info-product-card-copy"><div className="info-product-meta"><Arrow diagonal /></div><h3>{product.name}</h3><p><Lines>{t(product.description, lang)}</Lines></p><span className="info-card-link">{t(labels.explore, lang)} <Arrow /></span></div>
         </a>;
       })}</div>
     </section>
-    {last && <NextPanel title={lang === "ko" ? "우리의 접근을 더 알아보세요." : "Learn more about our approach."} href={pathFor("/solution", lang)} linkText={t(labels.definition, lang)} />}
+    <NextPanel title={lang === "ko" ? "우리의 접근을 더 알아보세요." : "Learn more about our approach."} href={pathFor("/solution", lang)} linkText={t(labels.definition, lang)} />
   </>;
 }
 
-function ProductDetailPage({ id, lang, last = true }: { id: ProductPage; lang: Language; last?: boolean }) {
+function ProductDetailPage({ id, lang }: { id: ProductPage; lang: Language }) {
   const product = products[id];
   return <>
     <section className="info-product-hero">
-      <div className="info-product-hero-copy"><h1>{product.name}</h1><p>{t(product.description, lang)}</p><TextLink href={`${pathFor("/solution", lang)}#products`}>{t(labels.allProducts, lang)}</TextLink></div>
+      <div className="info-product-hero-copy"><h1>{product.name}</h1><p><Lines>{t(product.description, lang)}</Lines></p><TextLink href={pathFor("/solution/product", lang)}>{t(labels.allProducts, lang)}</TextLink></div>
       <ProductArt id={id} lang={lang} />
     </section>
     <section className="info-section info-split-section">
       <div><h2>{t(product.headline, lang)}</h2></div>
-      <div className="info-prose"><p>{t(product.body, lang)}</p></div>
+      <div className="info-prose"><p><Lines>{t(product.body, lang)}</Lines></p></div>
     </section>
     <section className="info-section info-section-soft">
       <SectionHeading title={lang === "ko" ? "이렇게 바라봅니다." : "A closer perspective."} />
       <TopicCards items={product.perspectives} lang={lang} />
     </section>
-    {last && <NextPanel title={lang === "ko" ? "현장의 다음 단계를 함께 이야기합니다." : "Let's talk about the next step for your site."} href={pathFor("/contact", lang)} linkText={t(labels.contact, lang)} />}
+    <NextPanel title={lang === "ko" ? "현장의 다음 단계를 함께 이야기합니다." : "Let's talk about the next step for your site."} href={pathFor("/contact", lang)} linkText={t(labels.contact, lang)} />
   </>;
 }
 
@@ -220,16 +221,16 @@ function CompanyPage({ lang }: { lang: Language }) {
     <Hero title={lang === "ko" ? "데이터센터의" : "Defining the"} muted={lang === "ko" ? "Null Space를 정의합니다." : "Null Space in data centers."} description={lang === "ko" ? "아직 발견되지 않은 가능성을 찾고, 공간의 잠재력을 현실의 변화로 연결합니다." : "We look for possibilities yet to be discovered, connecting the potential of space with real-world change."} />
     <section className="info-section info-split-section">
       <div><h2>{lang === "ko" ? "보이지 않는 공간에도 기회는 존재합니다." : "Opportunity exists in the spaces we do not yet see."}</h2></div>
-      <div className="info-prose"><p>{lang === "ko" ? "NULL SPACE는 데이터센터의 공간과 운영 사이에 존재하는 가능성을 찾습니다. 복잡한 현장을 이해하고 기술과 데이터를 통해 더 나은 방식으로 연결합니다." : "NULL SPACE looks for possibilities between data center space and operations. We seek to understand complex environments and connect them in better ways through technology and data."}</p></div>
+      <div className="info-prose"><p><Lines>{lang === "ko" ? "NULL SPACE는 데이터센터의 공간과 운영 사이에 존재하는 가능성을 찾습니다. 복잡한 현장을 이해하고 기술과 데이터를 통해 더 나은 방식으로 연결합니다." : "NULL SPACE looks for possibilities between data center space and operations. We seek to understand complex environments and connect them in better ways through technology and data."}</Lines></p></div>
     </section>
     <section className="info-section info-section-soft">
       <SectionHeading title={lang === "ko" ? "NULL SPACE를 만나보세요." : "Get to know NULL SPACE."} />
-      <div className="info-company-links">{links.map(link => <a href={`${pathFor("/company", lang)}#${link.href.split("/").pop()}`} className="info-company-link" key={link.href}><div><Arrow diagonal /></div><h3>{link.title}</h3><p>{link.description}</p></a>)}</div>
+      <div className="info-company-links">{links.map(link => <a href={pathFor(link.href, lang)} className="info-company-link" key={link.href}><div><Arrow diagonal /></div><h3>{link.title}</h3><p><Lines>{link.description}</Lines></p></a>)}</div>
     </section>
   </>;
 }
 
-function TeamPage({ lang, last = true }: { lang: Language; last?: boolean }) {
+function TeamPage({ lang }: { lang: Language }) {
   const working = [
     { title: { ko: "문제를 정의합니다", en: "Define the problem" }, text: { ko: "현장의 맥락을 이해하고 중요한 질문을 찾습니다.", en: "Understand the context and find the important questions." } },
     { title: { ko: "가능성을 탐색합니다", en: "Explore possibilities" }, text: { ko: "데이터와 다양한 시각으로 새로운 시나리오를 그립니다.", en: "Explore new scenarios through data and different perspectives." } },
@@ -239,53 +240,39 @@ function TeamPage({ lang, last = true }: { lang: Language; last?: boolean }) {
     <Hero title={lang === "ko" ? "서로 다른 관점이 모여" : "Different perspectives,"} muted={lang === "ko" ? "하나의 문제를 풉니다." : "shared questions."} description={lang === "ko" ? "현장의 문제를 깊이 이해하고 기술과 디자인으로 가능한 해답을 찾아가는 팀입니다." : "A team working to understand real-world problems and explore possible answers through technology and design."} />
     <section className="info-section info-team-section">
       <div className="info-team-art"><Wireframe /></div>
-      <div className="info-team-copy"><h2>{lang === "ko" ? "이승훈" : "Seunghoon Lee"}</h2><p className="info-role">{lang === "ko" ? "설립자" : "Founder"}</p><p>{lang === "ko" ? "데이터센터의 복잡한 문제를 새로운 시선으로 바라봅니다. NULL SPACE는 다양한 분야의 사람들이 함께 질문하고, 실험하고, 만들어가는 팀입니다." : "Looking at complex data center challenges from a new perspective. NULL SPACE is a team where people from different fields question, experiment, and build together."}</p></div>
+      <div className="info-team-copy"><h2>{lang === "ko" ? "이승훈" : "Seunghoon Lee"}</h2><p className="info-role"><Lines>{lang === "ko" ? "설립자" : "Founder"}</Lines></p><p><Lines>{lang === "ko" ? "데이터센터의 복잡한 문제를 새로운 시선으로 바라봅니다. NULL SPACE는 다양한 분야의 사람들이 함께 질문하고, 실험하고, 만들어가는 팀입니다." : "Looking at complex data center challenges from a new perspective. NULL SPACE is a team where people from different fields question, experiment, and build together."}</Lines></p></div>
     </section>
     <section className="info-section info-section-soft">
       <SectionHeading title={lang === "ko" ? "질문하고, 검증하며 나아갑니다." : "Question, validate, move forward."} description={lang === "ko" ? "큰 변화는 현장을 이해하는 일에서 시작됩니다." : "Meaningful change starts with understanding the field."} />
       <TopicCards items={working} lang={lang} />
     </section>
-    {last && <NextPanel title={lang === "ko" ? "함께할 다음 기회를 기다립니다." : "We look forward to what we can do together."} href={pathFor("/contact", lang)} linkText={t(labels.contact, lang)} />}
+    <NextPanel title={lang === "ko" ? "함께할 다음 기회를 기다립니다." : "We look forward to what we can do together."} href={pathFor("/contact", lang)} linkText={t(labels.contact, lang)} />
   </>;
 }
 
-function PartnersPage({ lang, last = true }: { lang: Language; last?: boolean }) {
+function PartnersPage({ lang }: { lang: Language }) {
   return <>
     <Hero title={lang === "ko" ? "더 나은 인프라는" : "Better infrastructure"} muted={lang === "ko" ? "함께 만들어갑니다." : "is built together."} description={lang === "ko" ? "현장의 전문성과 새로운 기술이 만나는 곳에서 가능성을 탐색합니다." : "Exploring possibilities where field expertise and new technology meet."} variant="orbit" />
     <section className="info-section">
       <SectionHeading title={lang === "ko" ? "현장과 함께 검토하는 다음 단계." : "Exploring the next step together in the field."} description={lang === "ko" ? "서로 다른 전문성을 연결해 현장의 질문을 함께 정의하고 검증합니다." : "We connect different areas of expertise to define and examine real-world questions together."} />
       <article className="info-partner-card">
         <div className="info-partner-card-top"><span>{lang === "ko" ? "공동 실증" : "JOINT PILOT"}</span><span>2026.09 — 2027.03</span></div>
-        <div className="info-partner-card-main"><div><h3>{lang === "ko" ? "HD현대중공업" : "HD Hyundai Heavy Industries"}</h3><p>{lang === "ko" ? "데이터센터 냉각 전력 최적화를 위한 공동 실증" : "A joint pilot exploring data center cooling power optimization"}</p></div><div className="info-partner-symbol" aria-hidden="true"><span>×</span></div></div>
-        <p className="info-partner-note">{lang === "ko" ? "현장 조건을 바탕으로 냉각 운영의 가능성을 함께 살펴봅니다. 구체적인 결과는 실증과 검토를 통해 확인해야 합니다." : "Together, we are exploring cooling operations in the context of real site conditions. Specific results need to be confirmed through the pilot and further review."}</p>
+        <div className="info-partner-card-main"><div><h3>{lang === "ko" ? "HD현대중공업" : "HD Hyundai Heavy Industries"}</h3><p><Lines>{lang === "ko" ? "데이터센터 냉각 전력 최적화를 위한 공동 실증" : "A joint pilot exploring data center cooling power optimization"}</Lines></p></div><div className="info-partner-symbol" aria-hidden="true"><span>×</span></div></div>
+        <p className="info-partner-note"><Lines>{lang === "ko" ? "현장 조건을 바탕으로 냉각 운영의 가능성을 함께 살펴봅니다. 구체적인 결과는 실증과 검토를 통해 확인해야 합니다." : "Together, we are exploring cooling operations in the context of real site conditions. Specific results need to be confirmed through the pilot and further review."}</Lines></p>
       </article>
     </section>
-    {last && <NextPanel title={lang === "ko" ? "새로운 가능성을 함께 발견할 파트너를 기다립니다." : "Let's discover new possibilities together."} description={lang === "ko" ? "공동 실증과 파트너십에 관한 대화를 시작해 보세요." : "Start a conversation about a joint pilot or partnership."} href={pathFor("/contact", lang)} linkText={lang === "ko" ? "파트너십 문의" : "Discuss a partnership"} />}
+    <NextPanel title={lang === "ko" ? "새로운 가능성을 함께 발견할 파트너를 기다립니다." : "Let's discover new possibilities together."} description={lang === "ko" ? "공동 실증과 파트너십에 관한 대화를 시작해 보세요." : "Start a conversation about a joint pilot or partnership."} href={pathFor("/contact", lang)} linkText={lang === "ko" ? "파트너십 문의" : "Discuss a partnership"} />
   </>;
 }
 
-const SOLUTION_SECTIONS: Page[] = ["definition", "products", "n-mover", "n-prover", "n-doras"];
-const COMPANY_SECTIONS: Page[] = ["company", "team", "partners"];
-
-/** Each top menu is one scrolling page; a sub-menu (path or #hash) scrolls to its section. */
 export function InfoPage({ page, lang }: { page: Page; lang: Language }) {
-  const sections = SOLUTION_SECTIONS.includes(page) ? SOLUTION_SECTIONS : COMPANY_SECTIONS;
-  useEffect(() => {
-    const id = window.location.hash.slice(1) || page;
-    if (id === sections[0]) return;
-    const go = () => document.getElementById(id)?.scrollIntoView({ block: "start" });
-    requestAnimationFrame(() => requestAnimationFrame(go));
-  }, [page, sections]);
-  const render = (id: Page, last: boolean) => {
-    if (id === "definition") return <DefinitionPage lang={lang} last={last} />;
-    if (id === "products") return <ProductsPage lang={lang} last={last} />;
-    if (id === "n-mover" || id === "n-prover" || id === "n-doras") return <ProductDetailPage id={id} lang={lang} last={last} />;
-    if (id === "company") return <CompanyPage lang={lang} />;
-    if (id === "team") return <TeamPage lang={lang} last={last} />;
-    return <PartnersPage lang={lang} last={last} />;
-  };
   return <div className="info-page" lang={lang}>
-    <Breadcrumb page={sections[0]} lang={lang} />
-    {sections.map((id, i) => <div id={id} className="info-anchor" key={id}>{render(id, i === sections.length - 1)}</div>)}
+    <Breadcrumb page={page} lang={lang} />
+    {page === "definition" && <DefinitionPage lang={lang} />}
+    {page === "products" && <ProductsPage lang={lang} />}
+    {(page === "n-mover" || page === "n-prover" || page === "n-doras") && <ProductDetailPage id={page} lang={lang} />}
+    {page === "company" && <CompanyPage lang={lang} />}
+    {page === "team" && <TeamPage lang={lang} />}
+    {page === "partners" && <PartnersPage lang={lang} />}
   </div>;
 }

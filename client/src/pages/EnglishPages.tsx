@@ -1,5 +1,6 @@
 import { type FormEvent, type ReactNode } from "react";
 import "./EnglishPages.css";
+import { Lines } from "../components/Lines";
 
 const email = "seunghoon.lee@null-space.io";
 
@@ -67,7 +68,7 @@ function PageIntro({ title, description, graphic = false }: { title: ReactNode; 
     <section className="en-intro">
       <div className="en-intro-copy">
         <h1>{title}</h1>
-        <p>{description}</p>
+        <p><Lines>{description}</Lines></p>
       </div>
       {graphic && (
         <div className="en-wireframe" aria-hidden="true">
@@ -114,7 +115,7 @@ export function EnglishNewsPage() {
           {newsItems.map(item => (
             <a href={`/en/news/${item.slug}`} className="en-news-item" key={item.slug}>
               <div className="en-category">{item.category}</div>
-              <div><h3>{item.title}</h3><p>{item.description}</p></div>
+              <div><h3>{item.title}</h3><p><Lines>{item.description}</Lines></p></div>
               <span className="en-news-arrow" aria-hidden="true">↗</span>
             </a>
           ))}
@@ -148,14 +149,14 @@ export function EnglishNewsDetailPage() {
   if (slug === "cfd-containment-200-racks") {
     return (
       <ArticleShell category="Technical note" title="Exploring containment with a 200-rack virtual layout">
-        <p className="en-article-lead">The journey toward a better data center begins with understanding how air flows.</p>
+        <p className="en-article-lead"><Lines>The journey toward a better data center begins with understanding how air flows.</Lines></p>
         <ScenarioGraphic />
         <h2>Questions that begin in a virtual space</h2>
-        <p>A data center’s cooling environment is connected to many factors, including rack layout, airflow and the shape of the space. Containment is one approach to examining the cooling environment by separating cold and warm airflows.</p>
-        <p>Scenario Lab is a CFD demo that explores different conditions using a 200-rack virtual layout. It offers a visual starting point for understanding the complexity of real-world environments.</p>
-        <div className="en-callout"><strong>Note</strong><p>This demo is based on a virtual layout. It has not yet been validated against on-site measurements and does not imply any specific performance or savings.</p></div>
+        <p><Lines>A data center’s cooling environment is connected to many factors, including rack layout, airflow and the shape of the space. Containment is one approach to examining the cooling environment by separating cold and warm airflows.</Lines></p>
+        <p><Lines>Scenario Lab is a CFD demo that explores different conditions using a 200-rack virtual layout. It offers a visual starting point for understanding the complexity of real-world environments.</Lines></p>
+        <div className="en-callout"><strong>Note</strong><p><Lines>This demo is based on a virtual layout. It has not yet been validated against on-site measurements and does not imply any specific performance or savings.</Lines></p></div>
         <h2>From simulation to the field</h2>
-        <p>Actual implementation requires further review and validation based on on-site conditions and data. Null Space values the process of connecting hypotheses with observation and real-world testing.</p>
+        <p><Lines>Actual implementation requires further review and validation based on on-site conditions and data. Null Space values the process of connecting hypotheses with observation and real-world testing.</Lines></p>
         <TextLink href="/en/solution">Explore our solution</TextLink>
       </ArticleShell>
     );
@@ -163,14 +164,14 @@ export function EnglishNewsDetailPage() {
   if (slug === "hd-hhi-cooling-pilot") {
     return (
       <ArticleShell category="Joint pilot" title="A joint pilot with HD Hyundai Heavy Industries for cooling power optimization">
-        <p className="en-article-lead">Together, we are exploring the potential to optimize data center cooling power in the field.</p>
+        <p className="en-article-lead"><Lines>Together, we are exploring the potential to optimize data center cooling power in the field.</Lines></p>
         <div className="en-article-feature"><span>Joint pilot · 2026.09 — 2027.03</span><strong>HD HYUNDAI<br />HEAVY INDUSTRIES <span>×</span><br />NULL SPACE</strong></div>
         <h2>The next step, together</h2>
-        <p>Null Space is conducting a joint pilot with HD Hyundai Heavy Industries to optimize data center cooling power. The pilot period runs from September 2026 to March 2027.</p>
-        <p>This collaboration is a process of gaining a deeper understanding of cooling operations based on on-site conditions and exploring applicable approaches together. Specific results must be confirmed through the pilot and subsequent review.</p>
-        <div className="en-callout"><strong>Pilot period</strong><p>2026.09 — 2027.03<br />Joint pilot for data center cooling power optimization</p></div>
+        <p><Lines>Null Space is conducting a joint pilot with HD Hyundai Heavy Industries to optimize data center cooling power. The pilot period runs from September 2026 to March 2027.</Lines></p>
+        <p><Lines>This collaboration is a process of gaining a deeper understanding of cooling operations based on on-site conditions and exploring applicable approaches together. Specific results must be confirmed through the pilot and subsequent review.</Lines></p>
+        <div className="en-callout"><strong>Pilot period</strong><p><Lines>2026.09 — 2027.03<br />Joint pilot for data center cooling power optimization</Lines></p></div>
         <h2>Connecting the field and technology</h2>
-        <p>New possibilities open up when different areas of expertise come together. Null Space continues to collaborate with others to define and validate real-world challenges.</p>
+        <p><Lines>New possibilities open up when different areas of expertise come together. Null Space continues to collaborate with others to define and validate real-world challenges.</Lines></p>
         <TextLink href="/en/contact">Ask about collaboration</TextLink>
       </ArticleShell>
     );
@@ -184,7 +185,7 @@ export function EnglishCareersPage() {
       <PageIntro title={<>People who ask<br /><span>better questions together.</span></>} description={<>In the face of problems without easy answers, we explore and learn together to build better infrastructure.</>} graphic />
       <section className="en-section en-career-open">
         <h2>There are no open<br />positions at this time.</h2>
-        <div><p>Interested in working with Null Space? Feel free to email us with questions or ideas for collaboration.</p><TextLink href={`mailto:${email}`}>{email}</TextLink></div>
+        <div><p><Lines>Interested in working with Null Space? Feel free to email us with questions or ideas for collaboration.</Lines></p><TextLink href={`mailto:${email}`}>{email}</TextLink></div>
       </section>
       <section className="en-section en-career-archive">
         <div className="en-list-heading"><h2>Past openings</h2></div>
@@ -192,7 +193,7 @@ export function EnglishCareersPage() {
           {careers.map(career => (
             <details className="en-archive-item" key={career.slug}>
               <summary><span className="en-category">{career.category}</span><strong>{career.title}</strong><span className="en-closed">Closed</span><span className="en-summary-plus" aria-hidden="true">+</span></summary>
-              <div className="en-archive-content"><p>{career.overview}</p><p>Deadline: {career.deadline}</p><TextLink href={`/en/careers/${career.slug}`}>View position details</TextLink></div>
+              <div className="en-archive-content"><p><Lines>{career.overview}</Lines></p><p><Lines>Deadline: {career.deadline}</Lines></p><TextLink href={`/en/careers/${career.slug}`}>View position details</TextLink></div>
             </details>
           ))}
         </div>
@@ -214,13 +215,13 @@ export function EnglishCareerDetailPage() {
         <div className="en-detail-rule">Deadline: {career.deadline}</div>
       </section>
       <article className="en-article">
-        <p className="en-article-lead">{career.overview}</p>
-        <div className="en-callout"><strong>Applications closed</strong><p>This position closed on {career.deadline}. We are not currently accepting applications.</p></div>
+        <p className="en-article-lead"><Lines>{career.overview}</Lines></p>
+        <div className="en-callout"><strong>Applications closed</strong><p><Lines>This position closed on {career.deadline}. We are not currently accepting applications.</Lines></p></div>
         <h2>About the role</h2>
-        <p>{career.slug === "ai-engineer" ? "The role focuses on connecting data and software with real-world challenges. It involves understanding problems from different perspectives and exploring possibilities through experimentation." : "The role focuses on turning complex problems into clear experiences and thinking about consistent, useful experiences across product and brand."}</p>
-        <p className="en-muted">This is a general introduction to the role, not an announcement of an active opening.</p>
+        <p><Lines>{career.slug === "ai-engineer" ? "The role focuses on connecting data and software with real-world challenges. It involves understanding problems from different perspectives and exploring possibilities through experimentation." : "The role focuses on turning complex problems into clear experiences and thinking about consistent, useful experiences across product and brand."}</Lines></p>
+        <p className="en-muted"><Lines>This is a general introduction to the role, not an announcement of an active opening.</Lines></p>
         <h2>Connecting with Null Space</h2>
-        <p>If you have questions about the team or future opportunities, please email us.</p>
+        <p><Lines>If you have questions about the team or future opportunities, please email us.</Lines></p>
         <TextLink href={`mailto:${email}`}>{email}</TextLink>
       </article>
       <div className="en-section en-detail-back"><a className="en-text-link" href="/en/careers">← &nbsp; View all positions</a></div>
@@ -253,15 +254,15 @@ export function EnglishContactPage() {
       <section className="en-section en-contact-layout">
         <div className="en-contact-side">
           <h2>Frequently asked<br />questions.</h2>
-          <p>Answers to questions you may have before getting in touch.</p>
+          <p><Lines>Answers to questions you may have before getting in touch.</Lines></p>
           <div className="en-faq-list">
-            {faqs.map(faq => <details className="en-faq" key={faq.question}><summary><strong>{faq.question}</strong><span className="en-summary-plus" aria-hidden="true">+</span></summary><p>{faq.answer}</p></details>)}
+            {faqs.map(faq => <details className="en-faq" key={faq.question}><summary><strong>{faq.question}</strong><span className="en-summary-plus" aria-hidden="true">+</span></summary><p><Lines>{faq.answer}</Lines></p></details>)}
           </div>
         </div>
         <div className="en-form-panel">
           <h2>How can we<br />help you?</h2>
-          <p className="en-form-intro">Complete the form below to open an email draft. Please review and send it yourself.</p>
-          <p className="en-required-note"><span aria-hidden="true">*</span> Required fields</p>
+          <p className="en-form-intro"><Lines>Complete the form below to open an email draft. Please review and send it yourself.</Lines></p>
+          <p className="en-required-note"><Lines><span aria-hidden="true">*</span> Required fields</Lines></p>
           <form onSubmit={handleSubmit} className="en-contact-form">
             <div className="en-form-row">
               <label>Name <span aria-hidden="true">*</span><input name="name" autoComplete="name" required onInput={clearCustomValidity} placeholder="Your name" /></label>
@@ -274,11 +275,11 @@ export function EnglishContactPage() {
             <label>Inquiry type <span aria-hidden="true">*</span><select name="type" defaultValue="" required><option value="" disabled>Select an inquiry type</option><option>Adoption / pilot</option><option>Investment / IR materials</option><option>Partnership</option><option>Other</option></select></label>
             <label>Message <span aria-hidden="true">*</span><textarea name="message" required onInput={clearCustomValidity} rows={6} placeholder="Tell us about your inquiry." /></label>
             <div className="en-privacy">
-              <p>The information you enter is used to create an email draft. This website does not automatically save or send your inquiry.</p>
+              <p><Lines>The information you enter is used to create an email draft. This website does not automatically save or send your inquiry.</Lines></p>
               <label className="en-check"><input type="checkbox" name="consent" required /><span>I consent to providing personal information for handling this inquiry. <b aria-hidden="true">*</b></span></label>
             </div>
             <button type="submit" className="en-form-submit"><span>Create email draft</span><span aria-hidden="true">↗</span></button>
-            <p className="en-form-note">Please review and send the email yourself from your email app.</p>
+            <p className="en-form-note"><Lines>Please review and send the email yourself from your email app.</Lines></p>
           </form>
         </div>
       </section>
