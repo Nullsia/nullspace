@@ -1,10 +1,12 @@
 // X-ray data hall loop for the home hero, ported from the standalone loop page.
-// Ambient 12 s camera loop; scroll progress (0..1) pushes the camera into the lime rack.
+// Ambient 12 s camera loop: the photoreal hall peels away into the x-ray wireframe around the lime rack.
+// Scroll progress (0..1) pushes the camera through the peel toward the lime rack.
 /* eslint-disable */
 // @ts-nocheck
 import * as THREE from "three";
 import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass.js";
 import { FullScreenQuad } from "three/examples/jsm/postprocessing/Pass.js";
+import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
 
 export function createXrayLoop(host: HTMLElement, { getProgress, reduced }: { getProgress: () => number; reduced: boolean }) {
 
@@ -67,9 +69,11 @@ const tx = X0 + TARGET.g * (groupW + GAP) + TARGET.k * RW + RW / 2;   // = 1.5
 const tz = rowZ(TARGET.row);
 const TFRONT = new THREE.Vector3(tx, 1.15, tz + RD / 2);
 
+const RACKS = [];
 function rack(i, g, k) {
   const cx = X0 + g * (groupW + GAP) + k * RW + RW / 2, zc = rowZ(i), f = i % 2 === 0 ? 1 : -1;
   const lime = (i === TARGET.row && g === TARGET.g && k === TARGET.k) ? 1 : 0;
+  RACKS.push({ cx, zc, f, lime });
   const xL = cx - RW / 2, xR = cx + RW / 2, zF = zc + f * RD / 2, zB = zc - f * RD / 2;
   const L = lime ? 1.6 : 1;
   boxEdges(xL, 0, zc - RD / 2, xR, RH, zc + RD / 2, 0.30 * L, lime);
@@ -119,7 +123,7 @@ for (let i = 0; i < ROWS; i++) {
   for (let g = 0; g < NG; g++) {
     const xa = X0 + g * (groupW + GAP), xb = xa + groupW;
     const zs = zc + f * (RD / 2 + 0.07);
-    seg([xa, 0.012, zs], [xb, 0.012, zs], 0.9);                      // 랙 밑 흰 조명줄
+    seg([xa, 0.012, zs], [xb, 0.012, zs], 0.4);                      // 랙 밑 흰 조명줄
     for (const [w, b] of [[0.12, 0.05], [0.35, 0.022], [0.8, 0.01]]) quad([xa, 0.004, zs - w], [xa, 0.004, zs + w], [xb, 0.004, zs + w], [xb, 0.004, zs - w], b);
     // 엔드 패널
     boxEdges(xa - 0.04, 0, zc - RD / 2 - 0.02, xa, RH + 0.05, zc + RD / 2 + 0.02, 0.28);
@@ -203,22 +207,23 @@ for (let s = 0; s < 6; s++) {
 for (let c = 0; c < 5; c++) cylY([23.9, 1.6 - c * 0.4], 0.14, 0, 1.6, 0.16, 3, 10);
 
 // ───────── 렌더러 ─────────
+const OUT = CAPTURE ? { w: 1920, h: 1080 } : null;
 const renderer = new THREE.WebGLRenderer({ antialias: false, alpha: false, preserveDrawingBuffer: CAPTURE, powerPreference: "high-performance" });
 renderer.setPixelRatio(1);
+renderer.localClippingEnabled = true;
 renderer.autoClear = false;
 host.appendChild(renderer.domElement);
-renderer.domElement.style.cssText = "display:block;width:100%;height:100%";
 const scene = new THREE.Scene();
 const cam = new THREE.PerspectiveCamera(40, 16 / 9, 0.05, 200);
 
 const U = {
   uCam: { value: new THREE.Vector3() }, uFwd: { value: new THREE.Vector3() },
   uFocus: { value: 10 }, uAper: { value: 0.3 }, uLayer: { value: 0 }, uCut: { value: 0.3 },
-  uGlow: { value: 0 }, uLime: { value: new THREE.Vector3(LIME.r, LIME.g, LIME.b) }, uT: { value: 0 }, uPx: { value: 1000 },
+  uGlow: { value: 0 }, uLime: { value: new THREE.Vector3(LIME.r, LIME.g, LIME.b) }, uT: { value: 0 }, uPx: { value: 1000 }, uReach: { value: 80 },
 };
 const COMMON = /* glsl */`
 uniform vec3 uCam; uniform vec3 uFwd; uniform float uFocus; uniform float uAper; uniform float uLayer;
-uniform float uCut; uniform float uMirror; uniform float uGlow; uniform vec3 uLime;
+uniform float uCut; uniform float uMirror; uniform float uGlow; uniform vec3 uLime; uniform float uReach; uniform float uSolid;
 float dofW(float dz){
   float c = clamp(abs(dz - uFocus) * uAper / max(dz, 0.4), 0., 1.);
   float wS = 1. - smoothstep(0.10, 0.40, c);
@@ -231,7 +236,10 @@ vec3 shade(vec3 W, float br, float lime){
   float cut = smoothstep(uCut, uCut + 0.25, dz);
   float scan = exp(-pow((dz - uCut - 0.12) / 0.09, 2.)) * step(uCut, dz);
   float fog = exp(-max(dist - 6., 0.) * 0.03) * exp(-max(dz - uFocus - 1.5, 0.) * 0.16);
-  float b = br * 0.8 * fog * cut * (1. + scan * 3.5);
+  float reach = 1. - smoothstep(uReach - 6., uReach, dz);
+  float front = exp(-pow((dz - uReach + 2.5) / 2.0, 2.)) * step(uReach, 79.);
+  if (uSolid > 0.5) { reach = (1. - reach) * 1.7; front = 0.; }
+  float b = br * 0.8 * fog * cut * reach;
   float lg = lime * clamp(uGlow * 3., 0., 1.);
   vec3 col = mix(vec3(b), uLime * min(b * (1.0 + 1.6 * uGlow), 0.8), lg);
   if (uMirror > 0.5) col *= 0.15 * exp(W.y * 0.8);
@@ -340,41 +348,127 @@ halo.position.set(tx, 1.1, tz); halo.frustumCulled = false; scene.add(halo);
 const pool = new THREE.Mesh(new THREE.PlaneGeometry(4.5, 4.5), glowMat(0.05, "float a = exp(-dot(q*vec2(1.0,1.5), q*vec2(1.0,1.5)) * 3.0);"));
 pool.rotation.x = -Math.PI / 2; pool.position.set(tx, 0.006, tz + 0.9); pool.frustumCulled = false; scene.add(pool);
 
+
+// ───────── 실사 장면: 같은 공간의 불투명 랙, 반사 바닥, 유리 구조선 (투시 전에 보이는 모습) ─────────
+const solid = new THREE.Scene();
+solid.fog = new THREE.Fog("#000000", 28, 78);
+const PEEL = new THREE.Plane(new THREE.Vector3(0, 0, -1), 1e5);       // 카메라 앞 투시 깊이까지 걷어 낸다
+{
+  const pm = new THREE.PMREMGenerator(renderer);
+  solid.environment = pm.fromScene(new RoomEnvironment(), 0.04).texture;
+  solid.environmentIntensity = 0.32;
+}
+solid.add(new THREE.HemisphereLight("#ffffff", "#000000", 0.18));
+const cnv = (w, h, fn) => { const c = document.createElement("canvas"); c.width = w; c.height = h; fn(c.getContext("2d"), w, h); return c; };
+function rackFront(seed) {
+  let s = seed; const r = () => { s = (s * 16807) % 2147483647; return s / 2147483647; };
+  const W2 = 128, H2 = 470, slots = [];
+  const n = 21, y0 = H2 * 0.05, uh = (H2 * 0.9) / n;
+  for (let j = 0; j < n; j++) slots.push(r() > 0.14 ? (r() > 0.7 ? 2 : 1) : 0);
+  const base = cnv(W2, H2, (g) => {
+    g.fillStyle = "#08090a"; g.fillRect(0, 0, W2, H2);
+    g.strokeStyle = "#3a3c40"; g.lineWidth = 3; g.strokeRect(4, 4, W2 - 8, H2 - 8);
+    slots.forEach((k, j) => {
+      const y = y0 + j * uh;
+      if (!k) { g.fillStyle = "#0e0f11"; g.fillRect(12, y + 1, W2 - 24, uh - 2); return; }
+      g.fillStyle = "#1b1c1f"; g.fillRect(12, y + 1, W2 - 24, uh - 2);
+      g.fillStyle = "#2c2e32"; for (let x = 30; x < W2 - 18; x += 5) g.fillRect(x, y + 4, 2, uh - 8);
+      g.fillStyle = "#4a4c50"; g.fillRect(14, y + 2, 10, uh - 4);
+    });
+  });
+  const emi = cnv(W2, H2, (g) => {
+    g.fillStyle = "#000"; g.fillRect(0, 0, W2, H2);
+    slots.forEach((k, j) => {
+      if (!k) return;
+      const y = y0 + j * uh;
+      g.fillStyle = k === 2 ? "#5a5a5a" : "#262626"; for (let x = 30; x < W2 - 18; x += 5) g.fillRect(x, y + 4, 2, uh - 8);
+      g.fillStyle = "#ffffff"; g.fillRect(16, y + uh * 0.3, 4, 4); if (r() > 0.4) g.fillRect(16, y + uh * 0.62, 4, 3);
+    });
+  });
+  const t = new THREE.CanvasTexture(base), e = new THREE.CanvasTexture(emi);
+  t.colorSpace = e.colorSpace = THREE.SRGBColorSpace; t.anisotropy = e.anisotropy = 8;
+  return new THREE.MeshStandardMaterial({ map: t, emissiveMap: e, emissive: "#ffffff", emissiveIntensity: 2.4, metalness: 0.55, roughness: 0.42, clippingPlanes: [PEEL] });
+}
+const rearTex = new THREE.CanvasTexture(cnv(64, 235, (g, w, h) => { g.fillStyle = "#0a0b0c"; g.fillRect(0, 0, w, h); g.fillStyle = "#1c1d20"; for (let y = 8; y < h - 8; y += 4) for (let x = 6; x < w - 6; x += 4) g.fillRect(x, y, 2, 2); }));
+rearTex.colorSpace = THREE.SRGBColorSpace;
+const sideM = new THREE.MeshStandardMaterial({ color: "#101113", metalness: 0.7, roughness: 0.35, clippingPlanes: [PEEL] });
+const topM = new THREE.MeshStandardMaterial({ color: "#16171a", metalness: 0.6, roughness: 0.5, clippingPlanes: [PEEL] });
+const rearM = new THREE.MeshStandardMaterial({ map: rearTex, metalness: 0.6, roughness: 0.45, clippingPlanes: [PEEL] });
+const STRIP = new THREE.MeshBasicMaterial({ color: new THREE.Color(2.4, 2.4, 2.4), clippingPlanes: [PEEL] });
+const mirror = new THREE.Group(); mirror.scale.y = -1; solid.add(mirror);
+{
+  const VAR = 4, groups = Array.from({ length: VAR }, () => []);
+  RACKS.forEach((r, i) => groups[i % VAR].push(r));
+  const m = new THREE.Matrix4(), q = new THREE.Quaternion(), up = new THREE.Vector3(0, 1, 0);
+  groups.forEach((rs, gi) => {
+    const mats = [sideM, sideM, topM, topM, rackFront(1234 + gi * 77), rearM];
+    for (const parent of [solid, mirror]) {
+      const mesh = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), mats, rs.length);
+      rs.forEach((r, k) => { q.setFromAxisAngle(up, r.f > 0 ? 0 : Math.PI); m.compose(new THREE.Vector3(r.cx, RH / 2, r.zc), q, new THREE.Vector3(RW - 0.012, RH, RD)); mesh.setMatrixAt(k, m); });
+      parent.add(mesh);
+    }
+  });
+  // 랙 밑 흰 조명줄 (실제 발광)
+  const strip = STRIP;
+  for (let i = 0; i < ROWS; i++) for (let g = 0; g < NG; g++) {
+    const xa = X0 + g * (groupW + GAP), f = i % 2 === 0 ? 1 : -1, z = rowZ(i) + f * (RD / 2 + 0.05);
+    for (const parent of [solid, mirror]) { const b = new THREE.Mesh(new THREE.BoxGeometry(groupW, 0.03, 0.05), strip); b.position.set(xa + groupW / 2, 0.02, z); parent.add(b); }
+  }
+  // 광택 바닥: 아래 거울상 위에 반투명 검정 판
+  const floor = new THREE.Mesh(new THREE.PlaneGeometry(140, 140), new THREE.MeshStandardMaterial({ color: "#000000", metalness: 0.0, roughness: 1.0, envMapIntensity: 0, transparent: true, opacity: 0.8, clippingPlanes: [PEEL] }));
+  floor.rotation.x = -Math.PI / 2; floor.renderOrder = 2; solid.add(floor);
+}
+// 구조선과 유리면: 와이어와 같은 형상을 깊이 검사하며 그린다 (랙 뒤는 가려진다)
+const mkSolid = (o, mirror, order) => {
+  const mat = new THREE.ShaderMaterial({ vertexShader: o === "pt" ? VS_PT : VS_BASIC, fragmentShader: o === "pt" ? FS_PT : FS_BASIC,
+    uniforms: { ...U, uMirror: { value: mirror ? 1 : 0 }, uSolid: { value: 1 } },
+    transparent: true, depthTest: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide });
+  return mat;
+};
+for (const [m, order] of [[1, 1], [0, 4]]) {
+  const a = new THREE.LineSegments(gL, mkSolid("l", m)), b = new THREE.Mesh(gF, mkSolid("f", m));
+  for (const o of [a, b]) { o.frustumCulled = false; o.renderOrder = order; solid.add(o); }
+}
+
 // ───────── 카메라 경로 (밀고 들어갔다가 이즈백) ─────────
 const path = new THREE.CatmullRomCurve3([
-  new THREE.Vector3(3.2, 6.1, 22.0),
-  new THREE.Vector3(2.3, 3.8, 11.0),
-  new THREE.Vector3(1.2, 2.0, 3.0),
-  new THREE.Vector3(0.4, 1.3, -0.8),
+  new THREE.Vector3(8.5, 2.0, 9.0),
+  new THREE.Vector3(5.5, 1.8, 5.0),
+  new THREE.Vector3(2.6, 1.5, 1.6),
+  new THREE.Vector3(1.0, 1.25, -1.2),
   new THREE.Vector3(0.0, 1.05, -3.3),
 ], false, "centripetal");
-const LOOK_A = new THREE.Vector3(0.2, 1.4, -6.0), LOOK_B = new THREE.Vector3(tx, 1.15, tz + RD / 2);
+const LOOK_A = new THREE.Vector3(-3.0, 2.4, -2.5), LOOK_B = new THREE.Vector3(tx, 1.15, tz + RD / 2);
 const sm = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
 const tmpL = new THREE.Vector3();
 function setTime(t) {               // t: 0..1 (한 루프)
   const s = Math.max(0, Math.min(1, getProgress()));
-  const p0 = 0.5 - 0.5 * Math.cos(2 * Math.PI * t);
-  const e0 = p0 * p0 * (3 - 2 * p0) * 0.5 + p0 * 0.5;
-  // Scrolling pushes the camera further toward the lime rack on top of the ambient loop.
-  const e = e0 + (0.9 - e0) * s;
-  const p = Math.max(p0, s);
+  const p = 0.5 - 0.5 * Math.cos(2 * Math.PI * t);
+  const e0 = p * p * (3 - 2 * p) * 0.5 + p * 0.5;
+  // Scrolling pushes the camera further into the hall, through the x-ray peel, toward the lime rack.
+  const e = e0 + (0.92 - e0) * s;
   cam.position.copy(path.getPoint(e));
   tmpL.copy(LOOK_A).lerp(LOOK_B, sm(0.0, 0.9, e));
-  cam.fov = 40 - 4 * e; cam.updateProjectionMatrix();
+  cam.fov = 54 - 18 * sm(0.0, 1.0, e); cam.updateProjectionMatrix();
   cam.lookAt(tmpL); cam.updateMatrixWorld();
   U.uCam.value.copy(cam.position);
   cam.getWorldDirection(U.uFwd.value);
   U.uFocus.value = TFRONT.clone().sub(cam.position).dot(U.uFwd.value);
-  U.uAper.value = 0.22 + 1.25 * sm(0.2, 1.0, e);
-  U.uGlow.value = sm(0.1, 0.65, p) * (0.88 + 0.12 * Math.sin(2 * Math.PI * 3 * t));
+  U.uAper.value = 1.25 * sm(0.45, 1.0, e);
+  U.uGlow.value = sm(0.5, 0.85, e) * (0.88 + 0.12 * Math.sin(2 * Math.PI * 3 * t));
+  // 외관 사진: 천천히 밀려 들어가다가, 투시가 깊어지며 와이어 내부로 넘어간다
+  U.uReach.value = 80 * Math.pow(sm(0.2, 0.56, e), 1.4);
+  outMat.uniforms.imgK.value = 0;
+  STRIP.color.setScalar(2.4 * (1 - sm(0.08, 0.26, e)));   // 투시가 시작되면 조명줄은 조용히 꺼진다
+  PEEL.normal.copy(U.uFwd.value); PEEL.constant = -(U.uFwd.value.dot(cam.position) + U.uReach.value);
   U.uT.value = t;
   halo.quaternion.copy(cam.quaternion);
 }
 
 // ───────── 후처리: 3겹 피사계 심도 + 번짐 ─────────
-const SS = Math.min(window.devicePixelRatio || 1, 1.5);
-let W = 0, H = 0, rtS, rtM, rtF, rtM2, rtF2, rtC, bloom;
-const rtOpt = (samples = 0): THREE.RenderTargetOptions => ({ type: THREE.HalfFloatType, samples, depthBuffer: false });
+const SS = CAPTURE ? 2 : Math.min(window.devicePixelRatio || 1, 1.5);
+let W = 0, H = 0, rtS, rtM, rtF, rtM2, rtF2, rtC, rtSolid, bloom;
+const rtOpt = (samples = 0) => ({ type: THREE.HalfFloatType, samples, depthBuffer: false });
 const fsq = new FullScreenQuad();
 const copyMat = new THREE.ShaderMaterial({ uniforms: { t: { value: null } }, vertexShader: `varying vec2 vUv; void main(){ vUv=uv; gl_Position=vec4(position.xy,0.,1.); }`, fragmentShader: `uniform sampler2D t; varying vec2 vUv; void main(){ gl_FragColor = texture2D(t, vUv); }` });
 const blurMat = new THREE.ShaderMaterial({ uniforms: { t: { value: null }, dir: { value: new THREE.Vector2() } },
@@ -384,19 +478,28 @@ const blurMat = new THREE.ShaderMaterial({ uniforms: { t: { value: null }, dir: 
       c += (texture2D(t,vUv+dir*1.3846).rgb + texture2D(t,vUv-dir*1.3846).rgb)*0.3162162;
       c += (texture2D(t,vUv+dir*3.2308).rgb + texture2D(t,vUv-dir*3.2308).rgb)*0.0702703;
       gl_FragColor = vec4(c,1.); }` });
-const compMat = new THREE.ShaderMaterial({ uniforms: { s: { value: null }, m: { value: null }, f: { value: null } },
+const compMat = new THREE.ShaderMaterial({ uniforms: { s: { value: null }, m: { value: null }, f: { value: null }, o: { value: null } },
   vertexShader: `varying vec2 vUv; void main(){ vUv=uv; gl_Position=vec4(position.xy,0.,1.); }`,
-  fragmentShader: `uniform sampler2D s; uniform sampler2D m; uniform sampler2D f; varying vec2 vUv;
-    void main(){ vec3 c = texture2D(s,vUv).rgb + texture2D(m,vUv).rgb + texture2D(f,vUv).rgb;
+  fragmentShader: `uniform sampler2D s; uniform sampler2D m; uniform sampler2D f; uniform sampler2D o; varying vec2 vUv;
+    void main(){ vec3 c = texture2D(s,vUv).rgb + texture2D(m,vUv).rgb + texture2D(f,vUv).rgb + texture2D(o,vUv).rgb;
       gl_FragColor = vec4(c,1.); }` });
-const outMat = new THREE.ShaderMaterial({ uniforms: { t: { value: null }, px: { value: new THREE.Vector2() } },
+const outMat = new THREE.ShaderMaterial({ uniforms: { t: { value: null }, px: { value: new THREE.Vector2() }, img: { value: null }, imgK: { value: 1 }, zoom: { value: 1 }, wide: { value: 1 }, zc: { value: new THREE.Vector2(0.625, 0.344) }, fit: { value: 1.3125 } },
   vertexShader: `varying vec2 vUv; void main(){ vUv=uv; gl_Position=vec4(position.xy,0.,1.); }`,
-  fragmentShader: `uniform sampler2D t; uniform vec2 px; varying vec2 vUv;
+  fragmentShader: `uniform sampler2D t; uniform vec2 px; uniform sampler2D img; uniform float imgK; uniform float zoom; uniform vec2 zc; uniform float fit; uniform float wide; varying vec2 vUv;
     vec3 srgb(vec3 c){ c = clamp(c,0.,1.); return mix(c*12.92, 1.055*pow(c,vec3(1./2.4))-0.055, step(0.0031308,c)); }
     void main(){
       vec3 c = texture2D(t,vUv).rgb;
-      vec2 v = vUv - 0.5; c *= 1. - smoothstep(0.35, 0.95, length(v*vec2(1.25,1.))) * 0.55;
       c *= 1.25; float m = max(max(c.r,c.g),c.b); if (m > 0.0001) c *= (m * (1. + m / 9.) / (1. + m)) / m * 1.35;
+      // 외관 사진 (화면 높이에 맞추고 오른쪽 정렬, zc를 중심으로 확대)
+      vec2 iu = vec2(1. - (1. - vUv.x) / fit, vUv.y);
+      iu = zc + (iu - zc) / zoom;
+      vec3 im = texture2D(img, clamp(iu, 0.001, 0.999)).rgb;
+      c = mix(c, im, imgK);
+      // 홈페이지용 가장자리: 왼쪽(글 영역)과 위아래가 검정으로 자연스럽게 녹아든다
+      float u = vUv.x, y = vUv.y;
+      float mk = mix(1., smoothstep(0.04, 0.6, u), wide);
+      mk *= smoothstep(0.0, 0.16, y) * smoothstep(1.0, 0.86, y) * mix(1., smoothstep(1.0, 0.975, u), wide);
+      c *= mk * mk * (3. - 2. * mk);
       float d = fract(sin(dot(floor(gl_FragCoord.xy), vec2(12.9898,78.233))) * 43758.5453) - 0.5;
       gl_FragColor = vec4(srgb(c) + d/255., 1.); }` });
 
@@ -411,12 +514,17 @@ function resize(w, h) {
   rtF = new THREE.WebGLRenderTarget(Math.round(iw / 4), Math.round(ih / 4), rtOpt(4));
   rtF2 = new THREE.WebGLRenderTarget(Math.round(iw / 4), Math.round(ih / 4), rtOpt());
   rtC = new THREE.WebGLRenderTarget(iw, ih, rtOpt());
+  if (rtSolid) rtSolid.dispose();
+  rtSolid = new THREE.WebGLRenderTarget(iw, ih, { type: THREE.HalfFloatType, samples: 4, depthBuffer: true });
   if (bloom) bloom.dispose();
   bloom = new UnrealBloomPass(new THREE.Vector2(Math.round(iw / 2), Math.round(ih / 2)), 0.36, 0.5, 0.6);
   cam.aspect = w / h;
-  // Shift the framing right on wide layouts so the lime rack clears the headline on the left.
-  cam.filmOffset = w / h > 1.2 ? -11 : 0;
+  // Wide layouts: shift the framing right so the lime rack clears the headline, and fade the left edge into the copy.
+  const wide = w / h > 1.2;
+  if (wide) cam.setViewOffset(w, h, -w * 0.16, 0, w, h); else cam.clearViewOffset();
   cam.updateProjectionMatrix();
+  outMat.uniforms.wide.value = wide ? 1 : 0;
+  outMat.uniforms.fit.value = (1920 / 823) / (w / h);
 }
 function blur(rt, tmp, scale, iters) {
   for (let i = 0; i < iters; i++) {
@@ -438,12 +546,16 @@ function draw() {
   }
   blur(rtM, rtM2, 1.1, 1);
   blur(rtF, rtF2, 1.2, 2);
+  U.uLayer.value = 0; U.uPx.value = (rtSolid.height / 2) / Math.tan(THREE.MathUtils.degToRad(cam.fov / 2));
+  renderer.setRenderTarget(rtSolid); renderer.clear(true, true, true); renderer.render(solid, cam);
+  compMat.uniforms.o.value = rtSolid.texture;
   compMat.uniforms.s.value = rtS.texture; compMat.uniforms.m.value = rtM.texture; compMat.uniforms.f.value = rtF.texture;
   fsq.material = compMat; renderer.setRenderTarget(rtC); fsq.render(renderer);
   bloom.render(renderer, null, rtC, 0, false);
   outMat.uniforms.t.value = rtC.texture; outMat.uniforms.px.value.set(1 / rtC.width, 1 / rtC.height);
   fsq.material = outMat; renderer.setRenderTarget(null); renderer.clear(); fsq.render(renderer);
 }
+
 
 
 const fit = () => { const w = Math.max(1, host.clientWidth), h = Math.max(1, host.clientHeight); if (w !== W || h !== H) resize(w, h); };
@@ -462,7 +574,9 @@ return {
   redraw() { if (!running) { setTime(0.62); draw(); } },
   dispose() {
     stop(); ro.disconnect(); io.disconnect();
-    [rtS, rtM, rtF, rtM2, rtF2, rtC].forEach(r => r && r.dispose()); bloom?.dispose();
+    [rtS, rtM, rtF, rtM2, rtF2, rtC, rtSolid].forEach(r => r && r.dispose()); bloom?.dispose();
+    solid.environment?.dispose?.();
+    solid.traverse(o => { o.geometry?.dispose?.(); const m = o.material; (Array.isArray(m) ? m : [m]).forEach(x => { x?.map?.dispose?.(); x?.emissiveMap?.dispose?.(); x?.dispose?.(); }); });
     scene.traverse(o => { o.geometry?.dispose?.(); o.material?.dispose?.(); });
     renderer.dispose(); renderer.domElement.remove();
   },
