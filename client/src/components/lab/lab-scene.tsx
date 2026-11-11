@@ -20,7 +20,7 @@ import { Flow, Slice, makeClip } from "../story/story-scene";
  * @see docs/renewal-2026-11.md
  */
 
-const BG = "#05070b";
+const BG = "#0b0b0b";
 
 /** 랙은 언제나 꽉 찬 캐비닛이다. 시나리오를 바꾸면 칸 색만 이전 색에서 새 색으로 0.6초 동안 넘어간다 */
 function Racks({ data }: { data: TwinData }) {
@@ -70,7 +70,7 @@ function Highlights({ data }: { data: TwinData }) {
     <>
       {hd.map((r) => (
         <lineSegments key={r.id} geometry={geoms} position={at(r)}>
-          <lineBasicMaterial color="#fbbf24" />
+          <lineBasicMaterial color="#c6ff3d" />
         </lineSegments>
       ))}
       {showHot && (
@@ -94,20 +94,20 @@ function Room({ data }: { data: TwinData }) {
     <group>
       <mesh position={[cx, room.floor - 0.01, cz]} rotation={[-Math.PI / 2, 0, 0]}>
         <planeGeometry args={[room.x, room.y]} />
-        <meshStandardMaterial color="#0c121d" roughness={0.95} />
+        <meshStandardMaterial color="#141414" roughness={0.95} />
       </mesh>
-      <gridHelper args={[60, 60, "#16263b", "#0f1a2a"]} position={[cx, room.floor - 0.02, cz]} />
+      <gridHelper args={[60, 60, "#2a2a2a", "#1a1a1a"]} position={[cx, room.floor - 0.02, cz]} />
       {tiles.map((t, i) => {
         const [x, , z] = toThree((t.x0 + t.x1) / 2, (t.y0 + t.y1) / 2, 0);
         return (
           <mesh key={i} position={[x, room.floor, z]} rotation={[-Math.PI / 2, 0, 0]}>
             <planeGeometry args={[t.x1 - t.x0, t.y1 - t.y0]} />
-            <meshBasicMaterial color="#132033" />
+            <meshBasicMaterial color="#222222" />
           </mesh>
         );
       })}
       <lineSegments geometry={outline} position={[cx, (room.floor + room.ceil) / 2, cz]}>
-        <lineBasicMaterial color="#334155" />
+        <lineBasicMaterial color="#4a4a4a" />
       </lineSegments>
       <CrahUnits data={data} />
       {containment.map(([a, b], i) => {
@@ -116,12 +116,12 @@ function Room({ data }: { data: TwinData }) {
           <mesh key={i} position={[x, y, z]}>
             <boxGeometry args={[b[0] - a[0], b[2] - a[2], b[1] - a[1]]} />
             <meshStandardMaterial
-              color="#38bdf8"
+              color="#e6e6e6"
               transparent
-              opacity={0.35}
+              opacity={0.22}
               depthWrite={false}
-              emissive="#0369a1"
-              emissiveIntensity={0.5}
+              emissive="#555555"
+              emissiveIntensity={0.4}
             />
           </mesh>
         );
@@ -130,31 +130,64 @@ function Room({ data }: { data: TwinData }) {
   );
 }
 
-function Controls({ center, interactive, reduced }: { center: THREE.Vector3; interactive: boolean; reduced: boolean }) {
+export interface LabView { pos: THREE.Vector3; target: THREE.Vector3 }
+
+/** Camera angle and zoom for each scenario, framed on what changes in it. */
+function viewFor(data: TwinData): LabView {
+  const { room, racks, units, key } = data.scene;
+  const [cx, , cz] = toThree(room.x / 2, room.y / 2, 0);
+  const c = new THREE.Vector3(cx, 0.3, cz);
+  const at = (x: number, y: number) => { const [a, , b] = toThree(x, y, 0); return new THREE.Vector3(a, 0.6, b); };
+  if (key === "S2_ai_racks") {
+    const hd = racks.filter(r => r.hd);
+    const t = hd.length ? hd.reduce((v, r) => v.add(at(r.x0 + r.w / 2, r.y0 + r.d / 2)), new THREE.Vector3()).divideScalar(hd.length) : c.clone();
+    return { target: t, pos: t.clone().add(new THREE.Vector3(-8, 8.5, 9.5)) };
+  }
+  if (key === "S3_containment") return { target: c.clone(), pos: c.clone().add(new THREE.Vector3(19, 15, 17)) };
+  if (key === "S4_cont_22C") return { target: c.clone(), pos: c.clone().add(new THREE.Vector3(-22, 27, -6)) };
+  if (key === "S5_cont_fail") {
+    const u = units.find(x => x.failed);
+    if (u) {
+      const t = at((u.x0 + u.x1) / 2, (u.y0 + u.y1) / 2);
+      const away = c.clone().sub(t).setY(0).normalize();
+      return { target: t.clone().lerp(c, 0.4), pos: t.clone().sub(away.clone().multiplyScalar(4)).add(new THREE.Vector3(0, 13, 0)).add(new THREE.Vector3(-away.z, 0, away.x).multiplyScalar(9)) };
+    }
+  }
+  return { target: c.clone(), pos: c.clone().add(new THREE.Vector3(-17, 18.7, 22)) };
+}
+
+function Controls({ view, interactive, reduced }: { view: LabView; interactive: boolean; reduced: boolean }) {
   const { camera, gl } = useThree();
   const controls = useMemo(() => new OrbitControls(camera, gl.domElement), [camera, gl]);
+  const flying = useRef(true);
   useEffect(() => {
-    controls.target.copy(center);
     controls.enableZoom = false;
     controls.enablePan = false;
     controls.enableDamping = true;
     controls.maxPolarAngle = Math.PI / 2.15;
     controls.minPolarAngle = Math.PI / 8;
     controls.enabled = interactive;
-    controls.autoRotate = !reduced;
-    controls.autoRotateSpeed = 0.5;
-    // 사용자가 한 번 돌리면 자동 회전을 멈춘다
-    const stop = () => {
-      controls.autoRotate = false;
-    };
+    // A drag takes over from the scripted camera until the next scenario.
+    const stop = () => { flying.current = false; };
     controls.addEventListener("start", stop);
-    controls.update();
     return () => {
       controls.removeEventListener("start", stop);
       controls.dispose();
     };
-  }, [controls, center, interactive, reduced]);
-  useFrame(() => controls.update());
+  }, [controls, interactive]);
+  useEffect(() => {
+    flying.current = true;
+    if (reduced) { camera.position.copy(view.pos); controls.target.copy(view.target); controls.update(); }
+  }, [view, reduced, camera, controls]);
+  useFrame((_, delta) => {
+    if (flying.current) {
+      const k = 1 - Math.exp(-delta * 2.6);
+      camera.position.lerp(view.pos, k);
+      controls.target.lerp(view.target, k);
+      if (camera.position.distanceTo(view.pos) < 0.02 && controls.target.distanceTo(view.target) < 0.02) flying.current = false;
+    }
+    controls.update();
+  });
   return null;
 }
 
@@ -165,11 +198,7 @@ function Scene({ data, interactive, reduced }: { data: TwinData; interactive: bo
     c.set(-100, 100);
     return c;
   }, []);
-  const { room } = data.scene;
-  const center = useMemo(() => {
-    const [cx, , cz] = toThree(room.x / 2, room.y / 2, 0);
-    return new THREE.Vector3(cx, 0.3, cz);
-  }, [room]);
+  const view = useMemo(() => viewFor(data), [data]);
 
   return (
     <>
@@ -183,7 +212,7 @@ function Scene({ data, interactive, reduced }: { data: TwinData; interactive: bo
       <Highlights data={data} />
       <Flow key={data.scene.key} data={data} clip={clip} />
       <Slice key={`s-${data.scene.key}`} data={data} clip={clip} />
-      <Controls center={center} interactive={interactive} reduced={reduced} />
+      <Controls view={view} interactive={interactive} reduced={reduced} />
     </>
   );
 }

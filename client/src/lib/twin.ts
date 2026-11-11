@@ -123,14 +123,16 @@ function parseFlow(buf: ArrayBuffer): FlowLine[] {
  * 온도 → 색 (0~1). 홈의 CFD 그림(ParaView, 16~32℃ 파랑, 흰색, 빨강)과 같은 축을 써서
  * 2D 그림과 3D 장면에서 같은 색이 같은 온도를 뜻하게 한다.
  */
+// NULL SPACE palette: cool air reads as neutral grey, heat as increasingly intense lime (#C6FF3D).
 const STOPS: [number, number, number, number][] = [
-  [16, 0.12, 0.3, 0.68],
-  [18, 0.2, 0.45, 0.85],
-  [20, 0.45, 0.66, 0.93],
-  [22.5, 0.95, 0.95, 0.95],
-  [25, 0.96, 0.6, 0.52],
-  [27, 0.89, 0.31, 0.29],
-  [32, 0.5, 0.06, 0.08],
+  [16, 0.12, 0.12, 0.12],
+  [18, 0.17, 0.17, 0.17],
+  [20, 0.24, 0.24, 0.24],
+  [22.5, 0.33, 0.33, 0.33],
+  [25, 0.44, 0.44, 0.44],
+  [26.5, 0.36, 0.46, 0.11],
+  [29, 0.58, 0.75, 0.18],
+  [32, 0.78, 1, 0.24],
 ];
 
 export function tempRgb(t: number, out: [number, number, number]): [number, number, number] {

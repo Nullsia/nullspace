@@ -38,3 +38,51 @@
 .lab-3d-layer.is-ready { opacity: 1; }
 .lab-3d-hint { position: absolute; right: 14px; bottom: 12px; font: 10px var(--mono); letter-spacing: .08em; color: rgba(255,255,255,.5); pointer-events: none; }
 @media (max-width: 760px) { .lab-visual-3d { min-height: 0; height: 360px; } }
+
+/* ---------- Home round 2 ---------- */
+/* Hero buttons: lime on hover. */
+@media (hover: hover) {
+  .home-page .hero-buttons a.button:not(:disabled):hover { background: var(--lime) !important; color: #090909 !important; border-bottom-color: var(--lime) !important; }
+}
+/* Stats: number and unit separated by the same gap as "1 sec". */
+.home-page .stat-row strong small { margin-left: .22em; }
+
+/* Products: show the whole object inside the card. */
+.home-page .product-image.prover { background: #b9b9bb; }
+.home-page .product-image.doras { background: #9e9da0; }
+.home-page .product-image.prover img, .home-page .product-image.doras img { object-fit: contain; object-position: center; }
+.home-page .product-image.prover img { padding: 18px 0 0; }
+
+/* Contact band: one-line headline, large CTA on the right. */
+.home-page .contact-band-content { display: flex; align-items: flex-end; justify-content: space-between; gap: 48px; }
+.home-page .contact-band h2 { white-space: nowrap; }
+.home-page .contact-band p { margin-bottom: 0; }
+.home-page .contact-band .button { flex: none; min-width: 320px; height: 84px; padding: 0 32px; font-size: 18px; gap: 60px; }
+@media (max-width: 1100px) { .home-page .contact-band h2 { white-space: normal; } }
+@media (max-width: 760px) {
+  .home-page .contact-band-content { display: block; }
+  .home-page .contact-band .button { margin-top: 36px; min-width: 0; width: 100%; height: 64px; font-size: 15px; }
+}
+
+/* Footer: one-line statement merged with the link row. */
+.site-footer { padding-top: 56px; }
+.site-footer .footer-top { align-items: center; gap: 32px; padding-bottom: 32px; border-bottom: 1px solid #2a2a2a; }
+.site-footer .footer-top h2 { margin-top: 0; white-space: nowrap; font-size: clamp(30px, 3.4vw, 52px); }
+.site-footer .footer-statement { text-align: right; }
+.site-footer .footer-bottom { padding-top: 22px; }
+@media (max-width: 760px) {
+  .site-footer .footer-top h2 { white-space: normal; }
+  .site-footer .footer-statement { text-align: left; margin-top: 18px; }
+}
+
+/* Scenario lab: larger twin; pinned while scrolling through the five scenarios. */
+.home-page .lab-content { grid-template-columns: 1.75fr .55fr; min-height: 620px; }
+@media (min-width: 900px) and (min-height: 620px) and (prefers-reduced-motion: no-preference) {
+  .home-page .lab-scroll { height: calc(100svh + 5 * 55svh); }
+  .home-page .lab-scroll > .lab-shell { position: sticky; top: max(16px, calc(50svh - 360px)); }
+  .home-page .lab-scroll .lab-content { min-height: 0; height: min(660px, calc(100svh - 100px)); }
+  .home-page .lab-scroll .lab-visual-3d { min-height: 0; }
+  .home-page .scenario-section { padding-bottom: 90px; }
+}
+@media (max-width: 1050px) { .home-page .lab-content { grid-template-columns: 1.4fr .6fr; } }
+@media (max-width: 760px) { .home-page .lab-content { min-height: 0; } .home-page .lab-visual-3d { height: 420px; } }

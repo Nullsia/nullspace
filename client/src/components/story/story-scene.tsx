@@ -49,7 +49,7 @@ export interface StorySceneProps {
   onReady?: () => void;
 }
 
-const FILM = "#67e8f9";
+const FILM = "#d4d4d4";
 const BG = "#05070b";
 const PARTICLE_SPACING = 0.9;
 const FLOW_SPEED = 1.5;

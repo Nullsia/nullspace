@@ -192,7 +192,7 @@ export function louvreTexture(): THREE.Texture {
   // 계기 창과 표시등
   g.fillStyle = "#1f2933";
   g.fillRect(W * 0.3, H * 0.1, W * 0.4, H * 0.1);
-  g.fillStyle = "#5eead4";
+  g.fillStyle = "#bdbdbd";
   g.fillRect(W * 0.34, H * 0.13, W * 0.18, H * 0.04);
   g.fillStyle = "#22c55e";
   g.fillRect(W * 0.6, H * 0.14, 8, 8);

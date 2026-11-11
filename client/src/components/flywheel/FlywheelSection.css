@@ -3,8 +3,8 @@
 .fw-layer.is-ready, .fw-labels.is-ready { opacity: 1; }
 .fw-labels { pointer-events: none; overflow: hidden; }
 .fw-node, .fw-edge, .fw-source { position: absolute; top: 0; left: 0; white-space: nowrap; }
-.fw-node { padding: 6px 12px; border: 1px solid rgba(255,255,255,.3); background: rgba(9,9,9,.8); color: #eee; font-size: 13px; font-weight: 700; transition: background .2s, color .2s, border-color .2s; }
-.fw-node.on { background: var(--lime); border-color: var(--lime); color: #090909; }
+.fw-node { padding: 6px 14px; border: 1px solid rgba(103,232,249,.3); border-radius: 999px; background: rgba(5,7,11,.8); color: #cffafe; font-size: 14px; font-weight: 700; transition: background .2s, color .2s, border-color .2s; }
+.fw-node.on { background: #67e8f9; border-color: #a5f3fc; color: #05070b; }
 .fw-edge { font-size: 12px; color: rgba(255,255,255,.55); }
 .fw-source { font: 12px var(--mono); color: rgba(255,255,255,.7); }
 .fw-hud { position: absolute; left: 14px; top: 14px; display: flex; flex-wrap: wrap; gap: 8px; pointer-events: none; font-size: 12px; }
@@ -18,20 +18,25 @@
 .fw-caption p { margin-top: 6px; font-size: 12px; line-height: 1.7; color: #aaa; word-break: keep-all; }
 .fw-steps { margin: 0; padding: 0; list-style: none; }
 .fw-steps .flow-item { padding: 0 !important; min-height: 0; }
-.fw-steps button { width: 100%; height: 100%; min-height: 120px; padding: 24px 24px 28px 0; border: 0 !important; background: transparent !important; color: #f4f4f4 !important; text-align: left; display: block; }
+.fw-steps button { width: 100%; height: 100%; min-height: 140px; padding: 26px 24px 30px 0; border: 0 !important; background: transparent !important; color: #f4f4f4 !important; text-align: left; display: block; }
 .fw-steps .flow-item + .flow-item button { padding-left: 25px; }
-.fw-steps button h3 { font: 500 14px var(--mono); letter-spacing: .04em; color: inherit; }
-.fw-steps button p { margin-top: 10px; font-size: 12px; color: #999; }
+.fw-steps button h3 { font: 600 20px var(--mono); letter-spacing: .02em; color: inherit; }
+.fw-steps button p { margin-top: 12px; font-size: 16px; color: #aaa; }
 .fw-steps button.active h3 { color: var(--lime); }
-@media (hover: hover) { .fw-steps button:not(:disabled):hover h3 { color: var(--lime); } }
+@media (hover: hover) { .fw-steps button:not(:disabled):hover { background: var(--lime) !important; color: #090909 !important; } .fw-steps button:not(:disabled):hover :is(h3, p) { color: #090909; } }
+.fw-steps .flow-item + .flow-item button { padding-left: 25px; }
+.fw-steps button { padding-left: 20px !important; }
 .fw-results { display: grid; grid-template-columns: repeat(3, 1fr); border-bottom: 1px solid #555; }
-.fw-results > div { padding: 28px 24px 34px 0; }
-.fw-results > div + div { border-left: 1px solid #555; padding-left: 25px; }
-.fw-results h3 { font-size: 19px; letter-spacing: -.04em; }
-.fw-results p { margin-top: 12px; font-size: 12px; line-height: 1.7; color: #999; word-break: keep-all; }
-.fw-note { margin-top: 16px; font: 9px var(--mono); letter-spacing: .08em; color: #777; }
+.fw-spot { position: relative; padding: 30px 24px 36px; overflow: hidden; --mx: 50%; --my: 50%; }
+.fw-spot + .fw-spot { border-left: 1px solid #555; }
+.fw-spot h3 { font-size: 22px; letter-spacing: -.04em; }
+.fw-spot p { margin-top: 12px; font-size: 15px; line-height: 1.7; color: #aaa; word-break: keep-all; }
+.fw-spot-inv { position: absolute; inset: 0; padding: inherit; background: var(--lime); color: #090909; clip-path: circle(0 at var(--mx) var(--my)); transition: clip-path .35s ease; pointer-events: none; }
+.fw-spot-inv p { color: #1a1a1a; }
+@media (hover: hover) { .fw-spot:hover .fw-spot-inv { clip-path: circle(150px at var(--mx) var(--my)); transition: clip-path .35s ease; } }
+.fw-note { margin-top: 18px; font: 13px var(--mono); letter-spacing: .02em; color: #888; }
 .fw-steps { margin-top: 0; border-top: 0 !important; }
 .fw-caption-out { display: none; }
 @media (max-width: 1023px) { .fw-stage { aspect-ratio: 16 / 10; } .fw-caption-in { display: none; } .fw-caption-out { display: block; position: static; max-width: none; background: #111; border: 1px solid #555; border-top: 0; } }
-@media (max-width: 760px) { .fw-hud { display: none; } .fw-steps button { min-height: 0; padding: 18px 12px !important; } .fw-results { grid-template-columns: 1fr; } .fw-results > div + div { border-left: 0; padding-left: 0; border-top: 1px solid #555; } .fw-results > div { padding: 22px 0; } .fw-stage { aspect-ratio: 4 / 5; } }
+@media (max-width: 760px) { .fw-hud { display: none; } .fw-steps button { min-height: 0; padding: 18px 12px !important; } .fw-results { grid-template-columns: 1fr; } .fw-spot + .fw-spot { border-left: 0; border-top: 1px solid #555; } .fw-spot { padding: 22px 0; } .fw-spot-inv { display: none; } .fw-steps button h3 { font-size: 17px; } .fw-steps button p { font-size: 14px; } .fw-stage { aspect-ratio: 4 / 5; } }
 @media (prefers-reduced-motion: reduce) { .fw-layer, .fw-labels, .fw-node { transition: none; } }

@@ -67,12 +67,12 @@
   top: 0;
   right: 0;
   bottom: 0;
-  width: 62%;
+  width: 82%;
   opacity: 0;
   transition: opacity .9s ease;
   pointer-events: none;
-  -webkit-mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.3) 18%, #000 46%);
-  mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.3) 18%, #000 46%);
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.25) 12%, rgba(0,0,0,.7) 24%, #000 38%);
+  mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.25) 12%, rgba(0,0,0,.7) 24%, #000 38%);
 }
 .hero-xray.is-ready { opacity: 1; }
 .hero-art.has-xray { background-image: none !important; background-color: #000; opacity: 1; }

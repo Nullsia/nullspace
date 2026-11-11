@@ -60,12 +60,12 @@ function Header({ lang, path }: { lang: Language; path: string }) {
             {en ? "Solution" : "솔루션"}<ChevronDown size={14} aria-hidden="true" />
           </button>
           <div className="nav-panel nav-solution-panel" id="submenu-solution" hidden={expanded !== "solution"}>
-            <a href={localPath("/solution", lang)} onClick={closeMenu}>{en ? "Definition" : "솔루션 소개"}</a>
-            <a className="nav-product-heading" href={localPath("/solution/product", lang)} onClick={closeMenu}>{en ? "Product" : "제품"}</a>
+            <a href={`${localPath("/solution", lang)}#definition`} onClick={closeMenu}>{en ? "Definition" : "솔루션 소개"}</a>
+            <a className="nav-product-heading" href={`${localPath("/solution", lang)}#products`} onClick={closeMenu}>{en ? "Product" : "제품"}</a>
             <div className="nav-sublist" aria-label={en ? "Products" : "제품 목록"}>
-              <a href={localPath("/solution/product/n-mover", lang)} onClick={closeMenu}>N-Mover</a>
-              <a href={localPath("/solution/product/n-prover", lang)} onClick={closeMenu}>N-Prover</a>
-              <a href={localPath("/solution/product/n-doras", lang)} onClick={closeMenu}>N-DORAS</a>
+              <a href={`${localPath("/solution", lang)}#n-mover`} onClick={closeMenu}>N-Mover</a>
+              <a href={`${localPath("/solution", lang)}#n-prover`} onClick={closeMenu}>N-Prover</a>
+              <a href={`${localPath("/solution", lang)}#n-doras`} onClick={closeMenu}>N-DORAS</a>
             </div>
           </div>
         </div>
@@ -74,8 +74,8 @@ function Header({ lang, path }: { lang: Language; path: string }) {
             {en ? "Company" : "회사"}<ChevronDown size={14} aria-hidden="true" />
           </button>
           <div className="nav-panel" id="submenu-company" hidden={expanded !== "company"}>
-            <a href={localPath("/company/team", lang)} onClick={closeMenu}>{en ? "Team" : "팀"}</a>
-            <a href={localPath("/company/partners", lang)} onClick={closeMenu}>{en ? "Partners" : "파트너"}</a>
+            <a href={`${localPath("/company", lang)}#team`} onClick={closeMenu}>{en ? "Team" : "팀"}</a>
+            <a href={`${localPath("/company", lang)}#partners`} onClick={closeMenu}>{en ? "Partners" : "파트너"}</a>
           </div>
         </div>
         <a className="nav-direct" href={localPath("/news", lang)} onClick={closeMenu}>{en ? "News" : "뉴스"}</a>
@@ -94,8 +94,7 @@ function Header({ lang, path }: { lang: Language; path: string }) {
 function Footer({ lang }: { lang: Language }) {
   const en = lang === "en";
   return <footer className="site-footer">
-    <div className="footer-top"><div><h2>Define the<br />null space<span className="lime">.</span></h2></div><div className="footer-statement">{en ? <>We define the null space<br />in data center infrastructure.</> : <>데이터센터의 Null Space를 정의합니다.<br />인프라의 새로운 표준이 됩니다.</>}</div></div>
-    <div className="footer-rule" />
+    <div className="footer-top"><div><h2>Define the null space<span className="lime">.</span></h2></div><div className="footer-statement">{en ? <>We define the null space in data center infrastructure.</> : <>데이터센터의 Null Space를 정의합니다. 인프라의 새로운 표준이 됩니다.</>}</div></div>
     <div className="footer-bottom"><Brand lang={lang} /><div className="footer-links"><a href={localPath("/solution", lang)}>Solution</a><a href={localPath("/company", lang)}>Company</a><a href={localPath("/news", lang)}>News</a><a href={localPath("/careers", lang)}>Career</a><a href={localPath("/contact", lang)}>Contact</a></div><span>© 2026 NULL SPACE</span></div>
   </footer>;
 }
@@ -120,8 +119,8 @@ function App() {
     const basePath = isEnglish(normalized) ? normalized.slice(3) || "/" : normalized;
     const hash = window.location.hash.toLowerCase();
     const oldPageTargets: Record<string, [string, string]> = {
-      "/solution#products": ["/solution/product", ""], "/solution#traction": ["/company/partners", ""],
-      "/company#playbook": ["/company/team", ""],
+      "/solution#traction": ["/company", "#partners"],
+      "/company#playbook": ["/company", "#team"],
     };
     const target = oldPageTargets[`${basePath}${hash}`];
     if (target) {

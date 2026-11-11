@@ -313,8 +313,8 @@ export function CrahUnits({ data }: { data: TwinData }) {
   const { units, room } = data.scene;
   const mats = useMemo(() => {
     const make = (failed: boolean) => {
-      const tint = failed ? "#f87171" : "#ffffff";
-      const glow = failed ? { emissive: new THREE.Color("#9f1239"), emissiveIntensity: 0.8 } : {};
+      const tint = failed ? "#4a4a4a" : "#ffffff";
+      const glow = {};
       const louvre = new THREE.MeshStandardMaterial({
         map: louvreTexture(),
         color: tint,
@@ -323,12 +323,12 @@ export function CrahUnits({ data }: { data: TwinData }) {
         ...glow,
       });
       const plain = new THREE.MeshStandardMaterial({
-        color: failed ? "#e11d48" : "#d3d9e0",
+        color: failed ? "#2c2c2c" : "#d3d9e0",
         roughness: 0.55,
         metalness: 0.1,
         ...glow,
       });
-      const top = new THREE.MeshStandardMaterial({ color: failed ? "#be123c" : "#aab3bd", roughness: 0.6, ...glow });
+      const top = new THREE.MeshStandardMaterial({ color: failed ? "#333333" : "#aab3bd", roughness: 0.6, ...glow });
       // 상자 면 순서 +x, -x, +y, -y, +z, -z
       return {
         x: [louvre, louvre, top, plain, plain, plain],

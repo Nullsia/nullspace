@@ -43,6 +43,22 @@ const COPY = {
 };
 const SOURCES = ["BMS", "DCIM"];
 
+/** Result card: a lime circle follows the pointer and shows the card inverted inside it. */
+function SpotCard({ title, body }: { title: string; body: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const move = (e: React.PointerEvent) => {
+    const el = ref.current; if (!el) return;
+    const r = el.getBoundingClientRect();
+    el.style.setProperty("--mx", `${e.clientX - r.left}px`);
+    el.style.setProperty("--my", `${e.clientY - r.top}px`);
+  };
+  const content = <><h3>{title}</h3><p>{body}</p></>;
+  return <div className="fw-spot" ref={ref} onPointerMove={move} onPointerEnter={move}>
+    {content}
+    <div className="fw-spot-inv" aria-hidden="true">{content}</div>
+  </div>;
+}
+
 export default function FlywheelSection({ english }: { english: boolean }) {
   const t = english ? COPY.en : COPY.ko;
   const ref = useRef<HTMLDivElement>(null);
@@ -95,7 +111,7 @@ export default function FlywheelSection({ english }: { english: boolean }) {
         </button></li>;
       })}
     </ol>
-    <div className="fw-results">{t.results.map(r => <div key={r.title}><h3>{r.title}</h3><p>{r.body}</p></div>)}</div>
+    <div className="fw-results">{t.results.map(r => <SpotCard key={r.title} title={r.title} body={r.body} />)}</div>
     <p className="fw-note">{t.note}</p>
   </div>;
 }

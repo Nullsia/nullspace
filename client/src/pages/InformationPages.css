@@ -159,3 +159,7 @@
 @media (prefers-reduced-motion: reduce) {
   .info-page .info-product-card, .info-page .info-product-card img, .info-page .info-company-link, .info-page .info-button { transition: none; }
 }
+
+/* One page per top menu: sub-menu sections stack and are reachable by anchor. */
+.info-anchor { scroll-margin-top: 0; }
+.info-anchor + .info-anchor { border-top: 1px solid rgba(255,255,255,.12); }
