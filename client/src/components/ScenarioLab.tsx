@@ -67,7 +67,7 @@ export default function ScenarioLab({ lang }: { lang: "ko" | "en" }) {
   const cards = [
     { label: en ? "Max inlet temperature" : "최고 흡기온도", v: now?.inletMaxC, b: base?.inletMaxC, unit: "℃", better: "down" as const, fmt: (x: number) => <>{x.toFixed(1)}<small>℃</small></>, hot: (now?.inletMaxC ?? 0) > 27 },
     { label: en ? "Racks over 27℃" : "27℃ 초과 랙", v: now?.racksOver27, b: base?.racksOver27, unit: en ? "" : "대", better: "down" as const, fmt: (x: number) => <>{x}<small>{en ? " racks" : "대"}</small></>, hot: (now?.racksOver27 ?? 0) > 0 },
-    { label: "RCI(HI)", v: now?.rciHi, b: base?.rciHi, unit: "%p", better: "up" as const, fmt: (x: number) => <>{x.toFixed(1)}<small>%</small></>, hot: (now?.rciHi ?? 100) < 100, hint: en ? "100% = no overheated racks (ASHRAE index)" : "100% = 과열 랙 없음 (ASHRAE 지표)" },
+    { label: "RCI(HI)", v: now?.rciHi, b: base?.rciHi, unit: "%p", better: "up" as const, fmt: (x: number) => <>{x.toFixed(1)}<small>%</small></>, hot: (now?.rciHi ?? 100) < 100, hint: en ? "100% = no overheated racks (ASHRAE index)" : "100% = 과열 랙 없음 (ASHRAE 지표)", tip: en ? "Rack Cooling Index (high). Shows how far rack inlet temperatures exceed the recommended maximum of 27°C. 100% means no rack exceeds it, 96% or more is good, below 91% is poor (based on the allowable maximum of 32°C)." : "랙 냉각 지수(상한). 랙 흡기온도가 권장 상한 27°C를 얼마나 넘는지 나타냅니다. 100%면 넘는 랙이 없음, 96% 이상 양호, 91% 미만 나쁨 (허용 상한 32°C 기준)." },
   ];
 
   return <section className="scenario-module" id="scenario" aria-labelledby="scenario-heading">
@@ -89,7 +89,7 @@ export default function ScenarioLab({ lang }: { lang: "ko" | "en" }) {
     </div>
     <dl className="scenario-kpis" aria-live="polite">
       {cards.map(c => <div key={c.label} className={`scenario-kpi ${c.hot ? "is-hot" : ""}`}>
-        <dt>{c.label}</dt>
+        <dt>{c.label}{"tip" in c && c.tip && <span className="kpi-tip"><button type="button" className="kpi-tip-btn" aria-label={en ? `What is ${c.label}?` : `${c.label} 설명`} aria-describedby={`tip-${c.label}`}>?</button><span role="tooltip" id={`tip-${c.label}`} className="kpi-tip-text">{c.tip}</span></span>}</dt>
         <dd className="kpi-value">{c.v === undefined ? "—" : c.fmt(c.v)}</dd>
         <dd className="kpi-meta">{c.v !== undefined && c.b !== undefined ? <Delta now={c.v} base={c.b} unit={c.unit} better={c.better} against={against} en={en} /> : <span className="kpi-delta">{c.hint ?? (en ? "Reference scenario" : "기준 시나리오")}</span>}</dd>
       </div>)}

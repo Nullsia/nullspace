@@ -25,3 +25,12 @@
 .kpi-delta.is-bad { color: #f2f2f2; }
 @media (max-width: 1050px) { .scenario-module .lab-content { grid-template-columns: 1fr; } .scenario-module .lab-panel { border-left: 0; border-top: 1px solid #515151; } }
 @media (max-width: 760px) { .scenario-module { padding: 80px 22px 90px; } .scenario-module-heading { display: block; margin-bottom: 36px; } .scenario-module-heading p { margin-top: 24px; } .scenario-kpis { grid-template-columns: 1fr; } }
+
+/* KPI help tooltip: shown on hover or keyboard/tap focus of the "?" button. */
+.scenario-kpi dt { display: flex; align-items: center; gap: 8px; }
+.kpi-tip { position: relative; display: inline-flex; }
+.scenario-module .kpi-tip-btn { display: grid !important; place-items: center; width: 20px !important; min-width: 0 !important; height: 20px !important; min-height: 0 !important; padding: 0 !important; border: 1px solid rgba(255,255,255,.45) !important; border-radius: 50% !important; background: transparent !important; color: #cfcfcf !important; font-size: 12px; font-weight: 600; line-height: 1; cursor: help; }
+.scenario-module .kpi-tip-btn:hover, .scenario-module .kpi-tip-btn:focus-visible { border-color: var(--lime) !important; color: var(--lime) !important; outline: none; }
+.kpi-tip-text { position: absolute; z-index: 20; left: -8px; top: calc(100% + 10px); width: min(360px, 78vw); padding: 14px 16px; border: 1px solid rgba(255,255,255,.16); border-radius: 12px; background: #161616; box-shadow: 0 14px 40px rgba(0,0,0,.5); color: #e6e6e6; font-size: 14px; font-weight: 400; line-height: 1.65; letter-spacing: 0; word-break: keep-all; opacity: 0; visibility: hidden; transform: translateY(4px); transition: opacity .18s ease, transform .18s ease, visibility .18s; pointer-events: none; }
+.kpi-tip:hover .kpi-tip-text, .kpi-tip:focus-within .kpi-tip-text { opacity: 1; visibility: visible; transform: none; }
+@media (max-width: 760px) { .kpi-tip-text { left: auto; right: -8px; } }
