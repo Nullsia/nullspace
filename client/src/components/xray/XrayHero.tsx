@@ -26,9 +26,9 @@ export default function XrayHero({ onFail }: { onFail?: () => void }) {
     import("./xrayLoop").then(({ createXrayLoop }) => {
       if (cancelled) return;
       try {
-        const loop = createXrayLoop(host, { getProgress: () => progress, reduced });
+        // onReady: shaders compiled and a quality tier picked off-screen, so the fade-in starts on smooth frames.
+        const loop = createXrayLoop(host, { getProgress: () => progress, reduced, onReady: () => setReady(true) });
         dispose = loop.dispose;
-        requestAnimationFrame(() => setReady(true));
       } catch (err) {
         console.error("[xray-hero]", err);
         onFail?.();
