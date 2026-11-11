@@ -183,7 +183,7 @@
 @media (prefers-reduced-motion: reduce) { .info-page .info-team-card { transition: none; } }
 
 /* Playbook timeline: numbered steps on a thin rail, lime markers. */
-.info-page .info-steps { list-style: none; margin: 0 0 64px; padding: 0; position: relative; max-width: 860px; }
+.info-page .info-steps { list-style: none; margin: 0; padding: 0; position: relative; max-width: 860px; }
 .info-page .info-steps::before { content: ""; position: absolute; left: 17px; top: 18px; bottom: 18px; width: 1px; background: var(--info-line); }
 .info-page .info-step { position: relative; display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 28px; padding: 0 0 48px; }
 .info-page .info-step:last-child { padding-bottom: 0; }

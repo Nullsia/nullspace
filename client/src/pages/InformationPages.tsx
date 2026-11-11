@@ -257,12 +257,6 @@ const PLAYBOOK = [
   { title: { ko: "검증 보고와 확산", en: "Report and scale" }, month: { ko: "5개월차", en: "Month 5" }, text: { ko: "결과와 유지 조건을 정리하고, 다른 구역과 센터로 넓힐 범위를 제안합니다.", en: "We document results and conditions to sustain them, and propose how to extend to other zones and sites." }, out: { ko: "검증 보고서, 운영 권고안", en: "Validation report, operating recommendations" } },
 ];
 
-const PRINCIPLES = [
-  { title: { ko: "책임은 운영팀에 남기지 않습니다", en: "We share the responsibility" }, text: { ko: "변경 전에 해석으로 영향을 보여드리고, 변경 후 결과를 같이 확인합니다.", en: "We show the impact in simulation before any change, and check the result together after." } },
-  { title: { ko: "주장 대신 전후 수치", en: "Numbers, not claims" }, text: { ko: "모든 제안에는 측정 근거와 조치 후 재측정 결과가 붙습니다.", en: "Every proposal comes with measured evidence and a re-measurement after the change." } },
-  { title: { ko: "작게 시작합니다", en: "Start small" }, text: { ko: "한 구역에서 효과를 확인한 뒤 넓힙니다.", en: "We confirm the effect in one zone before scaling." } },
-];
-
 function Playbook({ lang }: { lang: Language }) {
   return <section className="info-section info-playbook" id="playbook">
     <SectionHeading title={lang === "ko" ? "이렇게 일합니다." : "How we work."} description={lang === "ko" ? "도입은 큰 계약부터 시작하지 않습니다. 작은 범위에서 재고, 고치고, 숫자로 확인한 뒤 넓힙니다. HD현대중공업 실증도 같은 순서로 진행합니다." : "Adoption doesn't start with a big contract. We measure, fix and confirm with numbers in a small scope, then expand. Our HD Hyundai Heavy Industries pilot follows the same order."} />
@@ -274,7 +268,6 @@ function Playbook({ lang }: { lang: Language }) {
         <p className="info-step-out"><strong>{lang === "ko" ? "결과물" : "Deliverables"}</strong>{t(s.out, lang)}</p>
       </div>
     </li>)}</ol>
-    <TopicCards items={PRINCIPLES} lang={lang} />
   </section>;
 }
 
