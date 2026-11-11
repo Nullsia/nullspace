@@ -320,7 +320,7 @@ function PartnersPage({ lang }: { lang: Language }) {
       <SectionHeading title={lang === "ko" ? "현장과 함께 검토하는 다음 단계." : "Exploring the next step together in the field."} description={lang === "ko" ? "서로 다른 전문성을 연결해 현장의 질문을 함께 정의하고 검증합니다." : "We connect different areas of expertise to define and examine real-world questions together."} />
       <article className="info-partner-card">
         <div className="info-partner-card-top"><span>{lang === "ko" ? "공동 실증" : "JOINT PILOT"}</span><span>2026.09 — 2027.03</span></div>
-        <div className="info-partner-card-main"><div><h3>{lang === "ko" ? "HD현대중공업" : "HD Hyundai Heavy Industries"}</h3><p><Lines>{lang === "ko" ? "데이터센터 냉각 전력 최적화를 위한 공동 실증" : "A joint pilot exploring data center cooling power optimization"}</Lines></p></div><div className="info-partner-symbol" aria-hidden="true"><span>×</span></div></div>
+        <div className="info-partner-card-main"><div><h3>{lang === "ko" ? "HD현대중공업" : "HD Hyundai Heavy Industries"}</h3><p><Lines>{lang === "ko" ? "데이터센터 냉각 전력 최적화를 위한 공동 실증" : "A joint pilot exploring data center cooling power optimization"}</Lines></p></div><img className="info-partner-logo" src="/images/hhi-logo-white.png" alt="HD Hyundai Heavy Industries" width="1216" height="198" /></div>
         <p className="info-partner-note"><Lines>{lang === "ko" ? "현장 조건을 바탕으로 냉각 운영의 가능성을 함께 살펴봅니다. 구체적인 결과는 실증과 검토를 통해 확인해야 합니다." : "Together, we are exploring cooling operations in the context of real site conditions. Specific results need to be confirmed through the pilot and further review."}</Lines></p>
       </article>
     </section>

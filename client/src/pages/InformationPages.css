@@ -196,3 +196,7 @@
 .info-page .info-step-out strong { margin-right: 10px; color: var(--lime, #c6ff3d); font-weight: 600; }
 .info-page .info-playbook .info-topic-card { min-height: 0; }
 @media (max-width: 760px) { .info-page .info-step { gap: 18px; padding-bottom: 36px; } .info-page .info-step-body h3 { flex-wrap: wrap; gap: 4px 12px; } }
+
+/* Partner logo on the right of the card. */
+.info-page .info-partner-logo { flex: 0 1 auto; width: clamp(220px, 30vw, 420px); height: auto; opacity: .92; }
+@media (max-width: 760px) { .info-page .info-partner-logo { width: min(100%, 260px); } }
