@@ -78,9 +78,10 @@
 /* Scenario lab: larger twin; pinned while scrolling through the five scenarios. */
 .home-page .lab-content { grid-template-columns: 1.75fr .55fr; min-height: 620px; }
 @media (min-width: 900px) and (min-height: 620px) and (prefers-reduced-motion: no-preference) {
-  .home-page .lab-scroll { height: calc(100svh + 5 * 55svh); }
+  .home-page .scenario-section { --stage-h: min(100svh, 880px); padding-top: 92px; }
+  .home-page .lab-scroll { height: calc(var(--stage-h) + 5 * 55svh); }
   /* The whole section (heading + lab) stays pinned while the scenarios step through. */
-  .home-page .lab-scroll > .lab-stage { position: sticky; top: 0; height: 100svh; display: flex; flex-direction: column; justify-content: center; padding: 28px 0; box-sizing: border-box; }
+  .home-page .lab-scroll > .lab-stage { position: sticky; top: max(0px, calc((100svh - var(--stage-h)) / 2)); height: var(--stage-h); display: flex; flex-direction: column; padding: 28px 0; box-sizing: border-box; }
   .home-page .lab-stage > .scenario-heading { padding: 0 0 clamp(18px, 3svh, 36px); flex: none; }
   .home-page .lab-stage > .scenario-heading h2 { font-size: clamp(34px, min(4.2vw, 6.4svh), 64px); }
   .home-page .lab-stage > .lab-shell { flex: 0 1 760px; min-height: 0; display: flex; flex-direction: column; }
@@ -101,12 +102,9 @@ p { text-wrap: balance; }
 
 /* Give the copy beside each heading enough width for one sentence per line on desktop. */
 @media (min-width: 1051px) {
-  .home-page .intro-layout, .home-page .scenario-heading, .home-page .solution-heading, .home-page .flywheel-heading { grid-template-columns: 1fr 1fr; gap: 6%; }
   .home-page .intro-copy, .home-page .solution-heading > div > p, .home-page .scenario-heading > p, .home-page .flywheel-heading > p { max-width: 580px; }
   .info-page .info-hero-description, .info-page .info-product-hero-copy > p:not(.info-eyebrow) { max-width: 780px; }
-  .info-page .info-split-section { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 6%; }
   .info-page .info-section-heading > p, .info-page .info-prose p, .info-page .info-next p { max-width: 640px; }
   .info-page .info-team-copy > p:last-child { max-width: 640px; }
-  .info-page .info-section-heading { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 6%; }
   .info-page .info-topic-card p { max-width: none; }
 }

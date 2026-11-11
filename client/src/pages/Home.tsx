@@ -83,12 +83,18 @@ function Home() {
   });
   // On wide screens the scenario lab pins while scrolling and steps through each scenario in order.
   const labScrollRef = useRef<HTMLDivElement>(null);
+  // The stage pins at its sticky top and stays there while the wrapper scrolls past it.
+  const labTravel = (wrap: HTMLElement) => {
+    const stage = wrap.firstElementChild as HTMLElement | null;
+    const pin = stage ? parseFloat(getComputedStyle(stage).top) || 0 : 0;
+    return { pin, travel: Math.max(1, wrap.offsetHeight - (stage?.offsetHeight ?? window.innerHeight)) };
+  };
   const scrollStepping = () => typeof window !== "undefined" && window.matchMedia("(min-width: 900px) and (min-height: 620px) and (prefers-reduced-motion: no-preference)").matches;
   const selectScenario = (index: number) => {
     const wrap = labScrollRef.current;
     if (wrap && scrollStepping()) {
-      const top = wrap.getBoundingClientRect().top + window.scrollY;
-      const travel = Math.max(1, wrap.offsetHeight - window.innerHeight);
+      const { pin, travel } = labTravel(wrap);
+      const top = wrap.getBoundingClientRect().top + window.scrollY - pin;
       window.scrollTo({ top: top + travel * ((index + 0.5) / scenarios.length), behavior: "smooth" });
     }
     setScenario(index);
@@ -105,8 +111,8 @@ function Home() {
       if (!wrap || !scrollStepping()) return;
       const rect = wrap.getBoundingClientRect();
       if (rect.bottom < 0 || rect.top > window.innerHeight) return;
-      const travel = Math.max(1, wrap.offsetHeight - window.innerHeight);
-      const p = Math.max(0, Math.min(0.999, -rect.top / travel));
+      const { pin, travel } = labTravel(wrap);
+      const p = Math.max(0, Math.min(0.999, (pin - rect.top) / travel));
       setScenario(Math.floor(p * scenarios.length));
     };
     const schedule = () => { if (!frame) frame = requestAnimationFrame(update); };
