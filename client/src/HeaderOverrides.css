@@ -116,11 +116,20 @@ p { text-wrap: balance; }
 .home-page .intro-section .stat-row { border-color: #4a4a4a; }
 .home-page .intro-section .stat-row > div + div, .home-page .intro-section .stat-row > div:nth-child(n+3) { border-color: #4a4a4a; }
 .home-page .intro-section .stat-row p { color: #9a9a9a; }
-.home-page .intro-inv { background: var(--lime); color: #090909; }
-.home-page .intro-inv .intro-layout h2 em { color: #4f6614; }
-.home-page .intro-inv .intro-copy p, .home-page .intro-inv .stat-row p { color: #1d2408; }
-.home-page .intro-inv .underlined-link { border-color: #090909; color: #090909; }
-.home-page .intro-inv .stat-row, .home-page .intro-inv .stat-row > div + div, .home-page .intro-inv .stat-row > div:nth-child(n+3) { border-color: rgba(9,9,9,.45); }
+/* Lit area: a lime beam from a lamp at the top edge, bright at the source and fading to the floor. Text in it is lit, not inverted. */
+.home-page .intro-inv {
+  color: #fbfff0;
+  background:
+    radial-gradient(ellipse 22% 16% at calc(var(--mx) - var(--spot-r) * .64) 0, rgba(246,255,214,.85), rgba(222,255,140,.35) 45%, transparent 100%),
+    linear-gradient(180deg, rgba(198,255,61,.62) 0%, rgba(198,255,61,.34) 30%, rgba(198,255,61,.16) 70%, rgba(198,255,61,.08) 100%),
+    #1f1f1f;
+}
+.home-page .intro-inv .intro-layout h2 { text-shadow: 0 0 22px rgba(214,255,110,.55); }
+.home-page .intro-inv .intro-layout h2 em { color: #e2ff9a; }
+.home-page .intro-inv .intro-copy p, .home-page .intro-inv .stat-row p { color: #eef6d6; }
+.home-page .intro-inv .stat-row strong, .home-page .intro-inv .stat-row b { color: #f4ffd0; text-shadow: 0 0 18px rgba(198,255,61,.6); }
+.home-page .intro-inv .underlined-link { border-color: #f4ffd0; color: #f4ffd0; }
+.home-page .intro-inv .stat-row, .home-page .intro-inv .stat-row > div + div, .home-page .intro-inv .stat-row > div:nth-child(n+3) { border-color: rgba(230,255,170,.45); }
 .home-page .stat-row strong small { white-space: nowrap; }
 
 /* Contact band: a round lime spotlight that lights up the wireframe data hall behind the copy. */
