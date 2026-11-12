@@ -2,29 +2,18 @@
 .spot { position: relative; --mx: -9999px; --my: -9999px; --spot-r: 0px; --spot-size: 150px; transition: --spot-r .28s ease; }
 .spot-inv { position: absolute; inset: 0; padding: inherit; pointer-events: none; overflow: hidden; z-index: 2; }
 .spot-circle > .spot-inv { clip-path: circle(var(--spot-r) at var(--mx) var(--my)); }
-/* Logo mark (490 x 538, top edge 145): runs from the section's top to its bottom and only moves sideways. */
+/* Logo mark (490 x 538, top edge 145): runs from the section's top to its bottom and only moves sideways.
+   The shape is a mask with feathered side edges, so the lit area fades into the dark like real light. */
 .spot-triangle { --sh: 600px; --spot-size: calc(var(--sh) / 2); }
 .spot-triangle > .spot-inv {
-  clip-path: polygon(
-    calc(var(--mx) - var(--spot-r) * .91) 0,
-    calc(var(--mx) - var(--spot-r) * .371) 0,
-    calc(var(--mx) + var(--spot-r) * .91) 100%,
-    calc(var(--mx) - var(--spot-r) * .91) 100%
-  );
+  --beam: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 538' preserveAspectRatio='none'%3E%3Cfilter id='f' x='-20%25' y='0' width='140%25' height='100%25'%3E%3CfeGaussianBlur stdDeviation='26 0'/%3E%3C/filter%3E%3Cpath d='M55 -40 L200 -40 L545 578 L55 578 Z' fill='%23fff' filter='url%28%23f%29'/%3E%3C/svg%3E");
+  -webkit-mask: var(--beam) no-repeat;
+  mask: var(--beam) no-repeat;
+  -webkit-mask-size: calc(var(--spot-r) * 2.229) 100%;
+  mask-size: calc(var(--spot-r) * 2.229) 100%;
+  -webkit-mask-position: calc(var(--mx) - var(--spot-r) * 1.114) 0;
+  mask-position: calc(var(--mx) - var(--spot-r) * 1.114) 0;
 }
-/* Soft halo around the beam: the same shape, a little wider, blurred so its edges bleed like real light. */
-.spot-glow { position: absolute; inset: 0; z-index: 1; pointer-events: none; overflow: hidden; filter: blur(26px); opacity: 0; transition: opacity .35s ease; }
-.spot-glow > i {
-  position: absolute; inset: 0;
-  background: linear-gradient(180deg, rgba(198,255,61,.55), rgba(198,255,61,.22) 55%, rgba(198,255,61,.08));
-  clip-path: polygon(
-    calc(var(--mx) - var(--spot-r) * .97) 0,
-    calc(var(--mx) - var(--spot-r) * .31) 0,
-    calc(var(--mx) + var(--spot-r) * 1.02) 100%,
-    calc(var(--mx) - var(--spot-r) * .97) 100%
-  );
-}
-.spot.is-on > .spot-glow { opacity: 1; }
 .spot.is-on { --spot-r: var(--spot-size); }
-@media not ((hover: hover) and (pointer: fine)) { .spot-inv, .spot-glow { display: none; } }
+@media not ((hover: hover) and (pointer: fine)) { .spot-inv { display: none; } }
 @media (prefers-reduced-motion: reduce) { .spot { transition: none; } }

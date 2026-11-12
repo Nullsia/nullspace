@@ -46,7 +46,6 @@ export default function Spotlight({ as: Tag = "div", shape, className = "", invC
   }, []);
   return <Tag ref={ref as never} id={id} className={`spot spot-${shape} ${className}`}>
     {children}
-    {shape === "triangle" && <div className="spot-glow" aria-hidden="true"><i /></div>}
     <div className={`spot-inv ${invClassName}`} aria-hidden="true" inert>{inverse ?? children}</div>
   </Tag>;
 }

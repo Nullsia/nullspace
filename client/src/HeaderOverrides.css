@@ -119,9 +119,10 @@ p { text-wrap: balance; }
 /* Lit area: a lime beam from a lamp at the top edge, bright at the source and fading to the floor. Text in it is lit, not inverted. */
 .home-page .intro-inv {
   color: #fbfff0;
+  --lamp: calc(var(--mx) - var(--spot-r) * .64);
   background:
-    radial-gradient(ellipse 22% 16% at calc(var(--mx) - var(--spot-r) * .64) 0, rgba(246,255,214,.85), rgba(222,255,140,.35) 45%, transparent 100%),
-    linear-gradient(180deg, rgba(198,255,61,.62) 0%, rgba(198,255,61,.34) 30%, rgba(198,255,61,.16) 70%, rgba(198,255,61,.08) 100%),
+    radial-gradient(ellipse calc(var(--spot-r) * .7) calc(var(--spot-r) * .42) at var(--lamp) 0, rgba(248,255,222,.9), rgba(230,255,160,.45) 40%, rgba(214,255,110,0) 100%),
+    radial-gradient(ellipse calc(var(--spot-r) * 1.6) calc(var(--spot-r) * 2.3) at var(--lamp) 0, rgba(198,255,61,.55), rgba(198,255,61,.3) 35%, rgba(198,255,61,.14) 65%, rgba(198,255,61,.05) 100%),
     #1f1f1f;
 }
 .home-page .intro-inv .intro-layout h2 { text-shadow: 0 0 22px rgba(214,255,110,.55); }
